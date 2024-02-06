@@ -1,27 +1,46 @@
+"use client";
+
 import * as React from "react";
 import { IconSvgProps } from "@/types";
+import { useEffect, useState } from "react";
 
-export const Logo: React.FC<IconSvgProps> = ({
-	size = 36,
+interface StopProps {
+	offset: string;
+	style: React.CSSProperties;
+  }
+  
+  export const Logo: React.FC<IconSvgProps> = ({
+	size = 30,
 	width,
 	height,
 	...props
-}) => (
-	<svg
+  }) => {
+	const [flashColor, setFlashColor] = useState('#FFD700');
+  
+	useEffect(() => {
+	  // Dynamically update the flash color
+	  const interval = setInterval(() => {
+		setFlashColor((prevColor) => (prevColor === '#FFD700' ? '#FFA500' : '#FFD700'));
+	  }, 500); // Change color every 500 milliseconds
+  
+	  return () => clearInterval(interval);
+	}, []);
+  
+	return (
+	  <svg
 		fill="none"
 		height={size || height}
-		viewBox="0 0 32 32"
+		viewBox={`0 0 24 24`}
 		width={size || width}
 		{...props}
-	>
-		<path
-			clipRule="evenodd"
-			d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-			fill="currentColor"
-			fillRule="evenodd"
-		/>
-	</svg>
-);
+	  >
+		<g>
+		  {/* Lightning bolt path with dynamic color */}
+		  <path fill={flashColor} d="M17 1L14.22 13H22L8 23l2.78-12H2L15 1z" />
+		</g>
+	  </svg>
+	);
+  };
 
 export const DiscordIcon: React.FC<IconSvgProps> = ({
 	size = 24,
