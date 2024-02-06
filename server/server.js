@@ -9,7 +9,7 @@ const app = express()
 
 app.use(cors())
 
-app.get("/api/", (req, res) => {
+app.get("/api", (req, res) => {
     res.send({"test" : ["gruppe 40 <3", "gruppe 40 <3 <3", "gruppe 40 <3 <3 <3"]})
 })
 

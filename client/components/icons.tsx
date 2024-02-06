@@ -18,10 +18,9 @@ interface StopProps {
 	const [flashColor, setFlashColor] = useState('#FFD700');
   
 	useEffect(() => {
-	  // Dynamically update the flash color
 	  const interval = setInterval(() => {
 		setFlashColor((prevColor) => (prevColor === '#FFD700' ? '#FFA500' : '#FFD700'));
-	  }, 500); // Change color every 500 milliseconds
+	  }, 500);
   
 	  return () => clearInterval(interval);
 	}, []);
@@ -35,7 +34,6 @@ interface StopProps {
 		{...props}
 	  >
 		<g>
-		  {/* Lightning bolt path with dynamic color */}
 		  <path fill={flashColor} d="M17 1L14.22 13H22L8 23l2.78-12H2L15 1z" />
 		</g>
 	  </svg>

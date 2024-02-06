@@ -1,3 +1,5 @@
+"use client";
+
 import { Link } from "@nextui-org/link";
 import { Snippet } from "@nextui-org/snippet";
 import { Code } from "@nextui-org/code"
@@ -5,10 +7,28 @@ import { button as buttonStyles } from "@nextui-org/theme";
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
+import { useEffect, useState } from "react";
 
 export default function Home() {
 
+	const [data, setData] = useState();
+	const [index, setIndex] = useState(0);
+
+	useEffect(() => {
+		fetch("http://localhost:5000/api").then(
+			res => res.json()
+		).then(
+			d => setData(d.test)
+		)
+	}, [])
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+		  setIndex((index) => ((index + 1) % 3));
+		}, 500);
 	
+		return () => clearInterval(interval);
+	  }, []);
 
 	return (
 		<section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -25,27 +45,22 @@ export default function Home() {
 			</div>
 
 			<div className="flex gap-3">
-				<Link
-					isExternal
-					href={siteConfig.links.docs}
+				<div
 					className={buttonStyles({ color: "primary", radius: "full", variant: "shadow" })}
 				>
-					Documentation
-				</Link>
-				<Link
-					isExternal
+					Create User
+				</div>
+				<div
 					className={buttonStyles({ variant: "bordered", radius: "full" })}
-					href={siteConfig.links.github}
 				>
-					<GithubIcon size={20} />
-					GitHub
-				</Link>
+					Login
+				</div>
 			</div>
 
 			<div className="mt-8">
 				<Snippet hideSymbol hideCopyButton variant="flat">
 					<span>
-						Get started by editing <Code color="primary">app/page.tsx</Code>
+						{data ? data[index] : "gruppe 40 <3 <3 <3"}
 					</span>
 				</Snippet>
 			</div>
