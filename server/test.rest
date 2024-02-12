@@ -1,0 +1,12 @@
+
+
+
+### ADD A FRIEND
+POST http://localhost:5000/api/teste
+Content-Type: application/json
+
+{
+    "en": "to",
+    "tre": "fire"
+}
+    
