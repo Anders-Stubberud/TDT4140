@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 import { Navbar } from "@/components/navbar";
 import { Link } from "@nextui-org/link";
 import clsx from "clsx";
-import { SearchBar} from "@/components/searchbar"
+import { SearchBar } from "@/components/searchbar";
 
 export const metadata: Metadata = {
   title: {
@@ -49,8 +49,6 @@ export default function RootLayout({
           </div>
         </Providers>
       </body>
-	  
-
     </html>
   );
 }
