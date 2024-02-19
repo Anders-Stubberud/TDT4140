@@ -9,16 +9,18 @@ import {
 	NavbarItem,
 	NavbarMenuItem,
 } from "@nextui-org/navbar";
-import { Button } from "@nextui-org/button";
 import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
-
+import {getAuth} from 'firebase/auth';
 import { link as linkStyles } from "@nextui-org/theme";
 
 import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
 import clsx from "clsx";
+
+import { useEffect } from "react";
+import "firebaseui/dist/firebaseui.css";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -28,10 +30,19 @@ import {
 	HeartFilledIcon,
 	SearchIcon,
 } from "@/components/icons";
-
 import { Logo } from "@/components/icons";
-
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { initializeApp } from "firebase/app";
+import {firebaseConfig} from '../firebase.js'
+import { signOut } from 'firebase/auth';
 export const Navbar = () => {
+
+	const app = initializeApp(firebaseConfig)
+
+	const auth = getAuth();
+
+	const [user] = useAuthState(auth);
+
 	const searchInput = (
 		<Input
 			aria-label="Search"
@@ -119,6 +130,7 @@ export const Navbar = () => {
 					))}
 				</div>
 			</NavbarMenu>
+			<button onClick={() => signOut(auth)}>logout</button>
 		</NextUINavbar>
 	);
 };

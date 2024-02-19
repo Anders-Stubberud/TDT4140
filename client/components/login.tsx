@@ -1,26 +1,15 @@
 import { useEffect } from "react";
 import { getAuth } from "firebase/auth";
-// import { generatePasswordResetLink, sendCustomPasswordResetEmail, getAuth } from "firebase-admin";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import { app } from "../firebase.js";
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Login() {
 
-  // const forgotPassword = () => {
-  //   const userEmail = 'user@example.com';
-  // getAuth()
-  // .generatePasswordResetLink(userEmail)
-  // .then((link: any) => {
-  //   // Construct password reset email template, embed the link and send
-  //   // using custom SMTP server.
-  //   return sendCustomPasswordResetEmail(userEmail, link);
-  // })
-  // .catch((error: any) => {
-  //   // Some error occurred.
-  // });
-  // }
+  const auth = getAuth();
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     const ui =
@@ -28,6 +17,7 @@ export default function Login() {
       new firebaseui.auth.AuthUI(getAuth(app));
 
     ui.start("#firebaseui-auth-container", {
+      signInFlow: 'popup',
       signInSuccessUrl: "/",
       signInOptions: [
         {
