@@ -1,32 +1,28 @@
-import { FlashcardContext } from "@/app/context/flashcardcontext";
 import { useContext } from "react";
+import { FlashcardContext } from "@/app/context/flashcardcontext";
 import "../styles/createflashcardform.css";
 
 export const CreateflashcardForm = () => {
-  const { setContent, setIsFlipped } = useContext(FlashcardContext);
-
-  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(event.target.value);
-  };
+  const { content, isFlipped, setIsFlipped } = useContext(FlashcardContext);
 
   const handleFlipCard = () => {
-    setIsFlipped((flipped) => !flipped); // Flipp kortet når "Backside"-knappen trykkes
+    setIsFlipped(!isFlipped);
   };
 
   return (
     <div className="card-component">
       <div className="card-header">
-        <div>QUESTION 6</div>
+        <div> {"Question: 11"}</div>
         <button className="toggle-button" onClick={handleFlipCard}>
-          Backside
+          {isFlipped ? "Frontside" : "Backside"}
         </button>
       </div>
       <div className="card-body">
         <textarea
           className="text-area"
-          placeholder="Frontside"
-          onChange={handleTextChange}
-        ></textarea>
+          placeholder={isFlipped ? "Backside" : "Frontside"}
+          value={content}
+        />
         <button className="small-button">Add picture</button>
       </div>
       <div className="card-footer">

@@ -13,10 +13,10 @@ export const FlashcardCreated = () => {
       <div id="maincontainer" onClick={() => setIsFlipped(!isFlipped)}>
         <div id="thecard" className={isFlipped ? "flipped" : ""}>
           <div id="thefront">
-            <p>Dette er foran</p>
+            <p>Front of card</p>
           </div>
           <div id="theback">
-            <p>Og dette er bak</p>
+            <p>Back of card</p>
           </div>
         </div>
       </div>
