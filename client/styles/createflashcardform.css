@@ -8,6 +8,7 @@
     margin-bottom: 75px;
   }
   
+
   .card-header {
     display: flex;
     justify-content: space-between;
@@ -66,14 +67,54 @@
   .text-area {
     width: 100%;
     height: 150px;
-    padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    
   }
   
   .navigation .button {
     background-color: #6c757d;
     color: white;
   }
-  
+
+/* createflashcardform.css */
+.save-set-popup {
+  position: fixed; /* Posisjonerer popup-en over alt annet innhold */
+  top: 50%; /* Sentrerer vertikalt */
+  left: 50%; /* Sentrerer horisontalt */
+  transform: translate(-50%, -50%); /* Justerer sentrering basert på popup-ens størrelse */
+  width: 500px; /* Bredden på popup-en */
+  background-color: #ffffff; /* Bakgrunnsfarge */
+  padding: 20px; /* Innvendig avstand */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Legger til en myk skygge rundt popup-en */
+  z-index: 100; /* Sikrer at popup-en vises over andre elementer */
+  border-radius: 8px; /* Avrundede hjørner for en mykere look */
+  border: 1px solid grey;
+}
+
+.save-set-popup input {
+  width: 100%; /* Gjør inputfeltet full bredde innenfor popup-en */
+  padding: 10px; /* Avstand inni inputfeltet */
+  margin-bottom: 20px; /* Avstand til neste element */
+  border: 1px solid #ccc; /* Grensefarge */
+  border-radius: 4px; /* Avrundede hjørner på inputfeltet */
+}
+
+.save-set-popup button {
+  padding: 10px 20px; /* Avstand inni knappen */
+  background-color: #007bff; /* Bakgrunnsfarge */
+  color: #fff; /* Tekstfarge */
+  border: none; /* Fjerner standard grense */
+  cursor: pointer; /* Endrer musepekeren til en peker */
+  margin-right: 10px; /* Avstand til neste knapp */
+  border-radius: 4px; /* Avrundede hjørner på knappen */
+}
+
+.save-set-popup button:last-child {
+  background-color: #6c757d; /* Bakgrunnsfarge for den siste knappen (cancel) */
+}
+
+.save-set-popup button:hover {
+  opacity: 0.8; /* Legger til en hover-effekt */
+}

@@ -1,38 +1,51 @@
 "use client";
 
-import React, { createContext, useState, FC } from "react";
-import { ReactNode } from "react";
+import React, { createContext, useState, FC, ReactNode } from "react";
 
 interface IFlashcardContext {
-  content: string;
-  setContent: (content: string) => void;
+  question: string;
+  setQuestion: (question: string) => void;
+  answer: string;
+  setAnswer: (answer: string) => void;
   isFlipped: boolean;
   setIsFlipped: (isFlipped: boolean) => void;
 }
 
-// Initialverdier for konteksten
-const defaultState = {
-  content: "",
-  setContent: () => {},
+const defaultState: IFlashcardContext = {
+  question: "",
+  setQuestion: () => {},
+  answer: "",
+  setAnswer: () => {},
   isFlipped: false,
   setIsFlipped: () => {},
 };
+
+// Oppretter konteksten med standardverdiene definert ovenfor
+export const FlashcardContext = createContext<IFlashcardContext>(defaultState);
 
 interface FlashcardProviderProps {
   children: ReactNode;
 }
 
-export const FlashcardContext = createContext<IFlashcardContext>(defaultState);
-
-export const FlashcardProvider = ({ children }: FlashcardProviderProps) => {
-  const [content, setContent] = useState<string>("");
+export const FlashcardProvider: FC<FlashcardProviderProps> = ({ children }) => {
+  const [question, setQuestion] = useState<string>("");
+  const [answer, setAnswer] = useState<string>("");
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
 
   return (
     <FlashcardContext.Provider
-      value={{ content, setContent, isFlipped, setIsFlipped }}
+      value={{
+        question,
+        setQuestion,
+        answer,
+        setAnswer,
+        isFlipped,
+        setIsFlipped,
+      }}
     >
       {children}
     </FlashcardContext.Provider>
   );
 };
+
+// Husk å eksportere Flashcard
