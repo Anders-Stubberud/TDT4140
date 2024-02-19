@@ -13,7 +13,7 @@
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    background-color: #f6f8fa;
+    background-color: #007bffd6;
     border-bottom: 1px solid #ccc;
   }
   
@@ -24,7 +24,7 @@
   
   .card-footer {
     padding: 10px;
-    background-color: #f6f8fa;
+    background-color: #cfd3d7;
     display: flex;
     justify-content: space-between;
     align-items: center;
