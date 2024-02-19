@@ -9,6 +9,7 @@ import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
 import { useEffect, useState } from "react";
 import { SearchBar } from "@/components/searchbar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 export default function Home() {
   const [data, setData] = useState();
   const [index, setIndex] = useState(0);

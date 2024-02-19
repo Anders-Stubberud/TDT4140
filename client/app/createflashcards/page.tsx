@@ -1,11 +1,12 @@
 "use client";
 
+import { CreateflashcardForm } from "@/components/createflashcardForm";
 import { title } from "@/components/primitives";
 
 export default function CreateflashcardsPage() {
   return (
     <div>
-      <h1 className={title()}>Blog</h1>
+      <CreateflashcardForm></CreateflashcardForm>
     </div>
   );
 }
