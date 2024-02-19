@@ -1,15 +1,18 @@
 "use client";
 
 import { CreateflashcardForm } from "@/components/createflashcardForm";
-import { title } from "@/components/primitives";
+import { FlashcardCreated } from "@/components/flashcardCreated";
+import { FlashcardProvider } from "@/app/context/flashcardcontext";
 
 export default function CreateflashcardsPage() {
   return (
-    <div>
+    <FlashcardProvider>
       <div className="flex justify-center items-center ">
-        {" "}
-        <CreateflashcardForm></CreateflashcardForm>
+        <CreateflashcardForm />
       </div>
-    </div>
+      <div className="flex justify-center items-center ">
+        <FlashcardCreated />
+      </div>
+    </FlashcardProvider>
   );
 }
