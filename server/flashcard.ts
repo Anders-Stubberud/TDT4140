@@ -1,11 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class Flashcard {
-    constructor(question, answer) {
+export default class Flashcard {
+
+    private question: string;
+    private answer: string;
+
+    constructor(question: string, answer: string){
         this.question = question;
         this.answer = answer;
     }
-    setQuestion(newQuestion) {
+
+    setQuestion(newQuestion: string) {
         this.question = newQuestion;
     }
     getQuestion() {
@@ -14,8 +17,7 @@ class Flashcard {
     getAnswer() {
         return this.answer;
     }
-    setAnswer(newAnswer) {
+    setAnswer(newAnswer: string) {
         this.answer = newAnswer;
     }
 }
-exports.default = Flashcard;

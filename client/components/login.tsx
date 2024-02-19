@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
@@ -10,6 +10,21 @@ export default function Login() {
 
   const auth = getAuth();
   const [user] = useAuthState(auth);
+  const apiURL = 'http://localhost:5000/api/';
+
+  useEffect(() => {
+    if (user) {
+      fetch(apiURL + '/setupUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user
+        }),
+      })
+    }
+  }, [user]);
 
   useEffect(() => {
     const ui =

@@ -1,10 +1,6 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, 
-        doc, 
-        setDoc,
-        getDoc,
-        getDocs
-    } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection } = require('firebase/firestore')
+const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
   apiKey: "AIzaSyCUtmsiv88rhzhOFOQuMhc7dV1k_ohjra8",
@@ -16,22 +12,10 @@ const firebaseConfig = {
   measurementId: "G-89FPG56HX9"
 };
 
-let app;
-let fireStoreDb;
+let app = initializeApp(firebaseConfig)
+let db = getFirestore(app);
 
-const initializeFirebaseApp = () => {
-    try {
-        app = initializeApp(firebaseConfig);
-        fireStoreDb = getFirestore();
-        return app;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-const getFirebaseApp = () => app;
-
-const uploadProcessedData = async (col, sub, data) => {
+const uploadData = async (col, sub, data) => {
     try {
         const document = doc(fireStoreDb, col, sub);
         await setDoc(document, data);
@@ -40,19 +24,47 @@ const uploadProcessedData = async (col, sub, data) => {
     }
 }
 
-module.exports = {
-    initializeFirebaseApp,
-    getFirebaseApp
-};
-
-const main = async () => {
+const flashcards = async () => {
     try {
-        initializeFirebaseApp()
-        await uploadProcessedData("teste", "noe", {"hei": "på deg"})
-        console.log('success')
+        const collectionRef = collection(db, 'flashcardSets');
+        const querySnapshot = await getDocs(collectionRef);
+        const documents = querySnapshot.docs.map(doc => doc.data());
+        return documents;
+    } catch (error) {
+        console.log(error)
+    } 
+}
+
+const fetchData = async (col, sub) => {
+    try {
+        const docRef = doc(db, col, sub);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data
+          } else {
+            // TODO: mer passende feilmelding/exception
+            console.log("No such document!");
+          }
     } catch (error) {
         console.log(error)
     }
 }
 
-main();
+module.exports = {
+    uploadData,
+    fetchData,
+    flashcards
+};
+
+
+const main = async () => {
+    try {
+        const collectionRef = collection(db, 'flashcardSets');
+        const querySnapshot = await getDocs(collectionRef);
+        const documents = querySnapshot.docs.map(doc => doc.data());
+    } catch (error) {
+        console.log(error)
+    }    
+};
+
+// main();

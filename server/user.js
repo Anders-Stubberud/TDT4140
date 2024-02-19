@@ -1,24 +1,34 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdminUser = exports.User = void 0;
 class User {
-    constructor(name, password) {
-        this.userID;
+    constructor(name, uid, favourites) {
+        this.admin = false;
+        this.uid = uid;
         this.name = name;
-        this.password = password;
-        this.sets = [];
-        this.favourites = [];
+        this.favourites = favourites;
     }
-
-    addSet(set) {
-        this.sets.push(set);
+    // public addSet(setName: string, set: typeof FlashcardSet): void {
+    //     this.sets.set(setName, set);
+    // }
+    addFavorite(setName) {
+        this.favourites.push(setName);
     }
-
-    addFavorite(set) {
-        this.sets.push(set);
+    // public deleteSet(set: string): void {
+    //     this.sets.delete(set);
+    // }
+    enableAdmin() {
+        this.admin = true;
     }
-
-    deleteSet(set) {
-        const i = this.sets.indexOf(set);
-        if (i != -1) {
-            this.sets.splice(i, 1);
-        }
+    getName() {
+        return this.name;
     }
 }
+exports.User = User;
+class AdminUser extends User {
+    constructor(name, uid, sets, favourites) {
+        super(name, uid, favourites);
+        this.admin = true;
+    }
+}
+exports.AdminUser = AdminUser;
