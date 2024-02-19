@@ -6,7 +6,10 @@ import { title } from "@/components/primitives";
 export default function CreateflashcardsPage() {
   return (
     <div>
-      <CreateflashcardForm></CreateflashcardForm>
+      <div className="flex justify-center items-center ">
+        {" "}
+        <CreateflashcardForm></CreateflashcardForm>
+      </div>
     </div>
   );
 }
