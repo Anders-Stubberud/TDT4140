@@ -1,10 +1,11 @@
-<<<<<<< HEAD
 import React, { useState } from "react";
 import "../styles/searchbar.css";
 import { Button } from "@nextui-org/button";
 import { db } from "@/firebase";
 import { query, where, getDocs, collection } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+
+
 
 export const SearchBar = () => {
   // State hook for å holde søkeverdien
@@ -35,6 +36,7 @@ export const SearchBar = () => {
       } else {
         querySnapshot.forEach((doc) => {
           console.log(`Found set: ${doc.id}`, doc.data());
+          
         });
       }
     } catch (error) {
@@ -61,21 +63,6 @@ export const SearchBar = () => {
         <button id="search" className="buttonStyle" onClick={handleSearch}>
           Search
         </button>
-=======
-"use client";
-
-import { useState } from "react";
-import { Button } from "@nextui-org/button";
-import "../styles/searchbar.css";
-
-export const SearchBar = () => {
-  return (
-    <div id="searchbarWrapper">
-      <div id="inputSection">
-        <input type="text" id="inputField" placeholder="Serch for set/user" />
-      </div>
-      <div id="buttonSection">
->>>>>>> dev
         <button className="buttonStyle">Filter</button>
         <button className="buttonStyle">Popular</button>
         <button className="buttonStyle" id="createSetButton">
