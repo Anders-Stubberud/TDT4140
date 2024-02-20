@@ -5,7 +5,9 @@ import { FlashCard } from "@/components/flashcard";
 export default function DisplayFlashCardSetPage() {
   return (
     <>
-      <FlashCard></FlashCard>;
+      <div className="flex justify-center items-center ">
+        <FlashCard></FlashCard>;
+      </div>
     </>
   );
 }
