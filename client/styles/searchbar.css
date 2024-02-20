@@ -1,11 +1,8 @@
 #searchbarWrapper {
-    width: 80%;
     height: 200px;
+    width: 1000px;
     background-color:#2467B5;
     border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 #inputSection {
@@ -30,7 +27,7 @@
     display: flex;
 }
 .buttonStyle {
-    width: 25%;
+    width: 20%;
     height: 20%;
     border-radius: 10px;
     background-color: #22ACE8;

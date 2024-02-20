@@ -32,7 +32,7 @@ app.use(express.json());
 
 app.get("/api/getFlashcards", async (req, res) => {
     try {
-        const data = await flashcards()
+        const data = await flashcards();
         res.send(data);
     } catch (error) {
         console.log(error)

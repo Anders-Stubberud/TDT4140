@@ -1,58 +1,91 @@
-import { useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import firebase from "firebase/compat/app";
-import * as firebaseui from "firebaseui";
-import "firebaseui/dist/firebaseui.css";
-import { app } from "../firebase.js";
+"use client";
+
+import { signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, provider } from '../firebase.js';
+import { Button } from "@nextui-org/react";
+import {Input} from "@nextui-org/react";
+import { Card, CardBody } from "@nextui-org/react";
+import { GoogleLoginButton, GithubLoginButton } from "react-social-login-buttons";
 
-export default function Login() {
+export const Login = () => {
 
-  const auth = getAuth();
-  const [user] = useAuthState(auth);
-  const apiURL = 'http://localhost:5000/api/';
+    const [user] = useAuthState(auth);
 
-  useEffect(() => {
-    if (user) {
-      fetch(apiURL + '/setupUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user
-        }),
-      })
-    }
-  }, [user]);
+	const loginGoogle = async () => {
+		provider.setCustomParameters({ prompt: 'select_account' });
+		signInWithPopup(auth, provider)
+		.then((result) => {
+			const credential = GoogleAuthProvider.credentialFromResult(result);
+			const token = credential ? credential.accessToken : null;
+			const user = result.user; // user.uid gives local id
+		}).catch((error) => {
+			const errorCode = error.code;
+			const errorMessage = error.message;
+			const email = error.customData.email;
+			const credential = GoogleAuthProvider.credentialFromError(error);
+		});
+	}
 
-  useEffect(() => {
-    const ui =
-      firebaseui.auth.AuthUI.getInstance() ||
-      new firebaseui.auth.AuthUI(getAuth(app));
+	const email = () => {
+		createUserWithEmailAndPassword(auth, "test@gmail.com", "test")
+		.then((userCredential) => {
+			const user = userCredential.user;
+		})
+		.catch((error) => {
+			const errorCode = error.code;
+			const errorMessage = error.message;
+		});
+	}
 
-    ui.start("#firebaseui-auth-container", {
-      signInFlow: 'popup',
-      signInSuccessUrl: "/",
-      signInOptions: [
-        {
-          provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        },
-        {
-          provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          customParameters: {
-            prompt: "select_account",
-          },
-        },
-        {
-          provider: firebase.auth.GithubAuthProvider.PROVIDER_ID,
-        },
-      ],
-      credentialHelper: firebaseui.auth.CredentialHelper.GOOGLE_YOLO,
-    });
-  }, []);
+	const googleStyle = {
+		backgroundColor: "#ffffff",
+		color: "#000000",
+		borderRadius: '15px'
+	}
 
-  return <div className="mt-40"><div id="firebaseui-auth-container"></div>
-  <p className="mt-10">Please select <span className="italic">sign in with email</span> if <br></br>you have forgot your credentials.</p>
-  </div>;
+	const activeGoogleStyle = {
+		backgroundColor: "#cccccc"
+	}
+
+	const githubStyle = {
+		backgroundColor: "#ffffff",
+		color: "#000000",
+		borderRadius: '15px'
+	};
+
+	const activeGithubStyle = {
+		backgroundColor: "#cccccc"
+	};
+
+    return (
+		<div className="flex justify-center">
+			<Card className="m-10 w-3/4">
+				<CardBody>
+					<div className="m-4">
+						<Input type="email" label="Email"/>
+					</div>
+					<div className="mt-1 mr-4 ml-4 mb-4">
+						<Input type="password" label="password"/>
+					</div>
+					<div className="flex justify-center mb-10">
+						<Button  className="w-32" onClick={email}>
+							Login
+						</Button>
+					</div>
+					<div className="m-4 mb-2">
+						<GoogleLoginButton
+							onClick={loginGoogle} style={googleStyle} activeStyle={activeGoogleStyle}
+						></GoogleLoginButton>
+					</div>
+					<div className="m-4 mt-2">
+						<GithubLoginButton 
+							iconColor="#000000" style={githubStyle} activeStyle={activeGithubStyle}>
+						</GithubLoginButton>
+					</div>
+				</CardBody>
+			</Card>
+		</div>
+    );
+
 }
