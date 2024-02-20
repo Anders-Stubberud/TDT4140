@@ -1,6 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+<<<<<<< HEAD
 import { getFirestore } from "firebase/firestore";
+=======
+>>>>>>> dev
 
 const firebaseConfig = {
     apiKey: process.env.apiKey,

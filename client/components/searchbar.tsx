@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import "../styles/searchbar.css";
 import { Button } from "@nextui-org/button";
@@ -60,6 +61,21 @@ export const SearchBar = () => {
         <button id="search" className="buttonStyle" onClick={handleSearch}>
           Search
         </button>
+=======
+"use client";
+
+import { useState } from "react";
+import { Button } from "@nextui-org/button";
+import "../styles/searchbar.css";
+
+export const SearchBar = () => {
+  return (
+    <div id="searchbarWrapper">
+      <div id="inputSection">
+        <input type="text" id="inputField" placeholder="Serch for set/user" />
+      </div>
+      <div id="buttonSection">
+>>>>>>> dev
         <button className="buttonStyle">Filter</button>
         <button className="buttonStyle">Popular</button>
         <button className="buttonStyle" id="createSetButton">
