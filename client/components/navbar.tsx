@@ -128,6 +128,7 @@ export const Navbar = () => {
         </div>
       </NavbarMenu>
       <button onClick={() => signOut(auth)}>logout</button>
+      <button onClick={() => console.log(user?.uid)}>userid</button>
     </NextUINavbar>
   );
 };
