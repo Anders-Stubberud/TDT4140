@@ -5,25 +5,40 @@ import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import { app } from "../firebase.js";
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { zustand } from "../state/zustand";
 
 export default function Login() {
 
+  const { setIsLoggedIn } = zustand();
   const auth = getAuth();
   const [user] = useAuthState(auth);
   const apiURL = 'http://localhost:5000/api/';
 
   useEffect(() => {
-    if (user) {
-      fetch(apiURL + '/setupUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user
-        }),
-      })
-    }
+    const fetchData = async () => {
+      if (user) {
+        try {
+          const response = await fetch(apiURL + '/setupUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              user
+            }),
+          });
+          if (response.ok) {
+            setIsLoggedIn(true);
+            console.log('punch')
+          } else {
+            console.error('Failed to setup user:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      }
+    };
+    fetchData();
   }, [user]);
 
   useEffect(() => {
