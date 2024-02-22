@@ -33,9 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-<<<<<<< HEAD
-=======
 
 # yarn
 yarn.lock
->>>>>>> dev
+
+# git
+.gitconfig.local
