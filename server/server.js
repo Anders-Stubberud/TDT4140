@@ -50,4 +50,4 @@ app.post('/api/setupUser', async (req, res) => {
     res.status(200).send(arr)
 })
 
-app.listen(5000, () => {console.log("server startet")})
+app.listen(5001, () => {console.log("server startet")})

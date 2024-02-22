@@ -22,7 +22,7 @@ export const FlashCard = () => {
   useEffect(() => {
     async function fetchFlashcards() {
       try {
-        const response = await fetch("http://localhost:5000/api/getFlashcards");
+        const response = await fetch("http://localhost:5001/api/getFlashcards");
         if (!response.ok) {
           throw new Error("Failed to fetch flashcards");
         }

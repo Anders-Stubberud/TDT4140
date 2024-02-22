@@ -12,7 +12,7 @@ export default function Login() {
   const { setIsLoggedIn } = zustand();
   const auth = getAuth();
   const [user] = useAuthState(auth);
-  const apiURL = 'http://localhost:5000/api/';
+  const apiURL = 'http://localhost:5001/api/';
 
   useEffect(() => {
     const fetchData = async () => {
