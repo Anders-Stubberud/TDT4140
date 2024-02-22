@@ -13,11 +13,13 @@ import { CustomCarousel } from "@/components/custom-carousel";
 import { useTheme } from "next-themes";
 import useWindowSize from 'react-use/lib/useWindowSize'
 import { useRouter } from 'next/navigation'
+import { toggleDarkMode } from "../state/zustand";
 import Confetti from 'react-confetti'
 
 export default function Home() {
 
-  const router = useRouter();
+	const { setDark } = toggleDarkMode();
+  	const router = useRouter();
 	const [login, toggleLogin] = useState(false);
 	const [darkmode, setDarkmode] = useState<boolean>(true)
 	const { theme, setTheme } = useTheme();
@@ -25,6 +27,7 @@ export default function Home() {
 
 	useEffect(() => {
 		setDarkmode(theme === "dark");
+		setDark(theme === "dark" ? "bg-black" : "bg-white")
 	}, [theme])
 
 	const customstyle = {
