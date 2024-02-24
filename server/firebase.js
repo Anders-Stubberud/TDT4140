@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -24,9 +24,17 @@ const uploadData = async (col, sub, data) => {
     }
 }
 
+const uploadFlashcardSet = async (setId, data) => {
+    try {
+        await setDoc(doc(db, "flashcardSets1", setId), data);
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 const flashcards = async () => {
     try {
-        const collectionRef = collection(db, 'flashcardSets');
+        const collectionRef = collection(db, 'flashcardSets1');
         const querySnapshot = await getDocs(collectionRef);
         const documents = querySnapshot.docs.map(doc => doc.data());
         return documents;
@@ -35,12 +43,20 @@ const flashcards = async () => {
     } 
 }
 
+const fetchFlashcardSet = async (id) => {
+    return fetchData("flashcardSets1", id);
+}
+
+const deleteSet = async (id) => {
+    await deleteDoc(doc(db, "flashcardSets1", id));
+}
 const fetchData = async (col, sub) => {
     try {
         const docRef = doc(db, col, sub);
+        // const docSnap = await doc(docRef);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return docSnap.data
+            return docSnap.data()
           } else {
             // TODO: mer passende feilmelding/exception
             console.log("No such document!");
@@ -53,7 +69,10 @@ const fetchData = async (col, sub) => {
 module.exports = {
     uploadData,
     fetchData,
-    flashcards
+    flashcards,
+    uploadFlashcardSet,
+    fetchFlashcardSet,
+    deleteSet
 };
 
 
