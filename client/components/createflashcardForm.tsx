@@ -1,17 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import { FlashcardContext } from "@/app/context/flashcardcontext";
 import "../styles/createflashcardform.css";
-
-interface IFlashcard {
-  question: string;
-  answer: string;
-}
+import { flashcard, flashcardSet, serverEndpoint } from "@/state/zustand";
+import {v4 as uuidv4} from "uuid";
 
 export const CreateflashcardForm = () => {
   const { setQuestion, setAnswer, question, answer, isFlipped, setIsFlipped } =
     useContext(FlashcardContext);
-
-  const [flashcards, setFlashcards] = useState<IFlashcard[]>([]);
+  const [flashcards, setFlashcards] = useState<flashcard[]>([]);
   const [showSavePopup, setShowSavePopup] = useState(false);
   const [setName, setSetName] = useState("");
   const payload = setName + flashcards;
@@ -19,7 +15,7 @@ export const CreateflashcardForm = () => {
   useEffect(() => {
     console.log(flashcards);
     console.log(setName);
-  }, [flashcards]); // Denne useEffect vil kjøre hver gang `flashcards` endrer seg
+  }, [flashcards]); // Runs every time flashcards is used
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuestion(e.target.value);
@@ -35,7 +31,11 @@ export const CreateflashcardForm = () => {
 
   const handleCreateCard = () => {
     if (question && answer) {
-      const newFlashcard = { question, answer };
+      const newFlashcard: flashcard = {
+        flashcardID: uuidv4(),
+        question: question,
+        answer: answer
+      }
       setFlashcards([...flashcards, newFlashcard]);
       setQuestion("");
       setAnswer("");
@@ -49,13 +49,34 @@ export const CreateflashcardForm = () => {
     setShowSavePopup(true);
   };
 
-  const handleSaveSet = () => {
-    console.log("Set Name:", setName);
-    console.log("Flashcards:", flashcards);
-    // Her ville du lagre settet med et navn og flashcards til din lagringsløsning
+  const handleSaveSet = async () => {
+    const payload: flashcardSet = {
+      flashcardSetID: uuidv4(),
+      name: setName,
+      creatorID: "", // You may set the creator's ID here
+      flashcards: flashcards
+    };
+    try {
+      const response = await fetch(serverEndpoint + '/api/uploadSet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payload
+        }),
+      });
+      if (response.ok) {
+        console.log('success');
+      } else {
+        console.error('Failed to setup user:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
     setShowSavePopup(false);
     setSetName("");
-    setFlashcards([]); // Rens liste etter lagring, eller kommenter ut denne linjen for å beholde flashcards i state
+    setFlashcards([]); // Flush set
   };
 
   return (

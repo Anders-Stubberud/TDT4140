@@ -8,12 +8,16 @@ const arr = {
     "status": "success"
 }
 
+const dbFail = {
+    "status": "Error in communication with db"
+}
+
 let user;
 
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const {db, uploadData, fetchData, flashcards } = require('./firebase.js')
+const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 app.use(cors())
 app.use(express.json());
@@ -37,7 +41,26 @@ app.get("/api/getFlashcards", async (req, res) => {
     } catch (error) {
         console.log(error)
     } 
-})  
+})
+
+app.get("/api/getFlashcard/:id", async (req, res) => {
+    try {
+        const data = await fetchFlashcardSet(req.params.id);
+        res.send(data);
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+app.delete("/api/deleteSet/:id", async (req, res) => {
+    try {
+        await deleteSet(id);
+        res.status(200).send(arr)
+    } catch (error) {
+        res.status(500).send()
+        console.log(error)
+    }
+})
 
 app.post('/api/setupUser', async (req, res) => {
     const user = req.body;
@@ -49,5 +72,12 @@ app.post('/api/setupUser', async (req, res) => {
     user = new User(name, uid, sets, favourites);
     res.status(200).send(arr)
 })
+
+app.post('/api/uploadSet', async (req, res) => {
+    const { payload } = req.body;
+    await uploadFlashcardSet(payload.flashcardSetID, payload);
+    // Further logic related to saving the set
+    res.status(200).send(arr);
+});
 
 app.listen(5001, () => {console.log("server startet")})

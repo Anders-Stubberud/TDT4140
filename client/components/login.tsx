@@ -48,7 +48,7 @@ export default function Login() {
 
     ui.start("#firebaseui-auth-container", {
       signInFlow: 'popup',
-      signInSuccessUrl: "/",
+      signInSuccessUrl: "/welcome",
       signInOptions: [
         {
           provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,

@@ -1,50 +1,34 @@
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
 import "../styles/flashcard.css";
-
-interface Card {
-  question: string;
-  answer: string;
-}
-
-interface FlashcardSet {
-  name: string;
-  cards: Card[];
-}
+import { toggleSet, flashcard, flashcardSet, serverEndpoint, JSONToFlashcardSet } from "@/state/zustand";
 
 export const FlashCard = () => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
+  const [flashcardSet, setFlashcardSet] = useState<flashcardSet | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-
-  const setName = "Steiner"; // Settet du vil ha spørsmål fra
+  const { setname } = toggleSet();
 
   useEffect(() => {
-    async function fetchFlashcards() {
+    const fetchFlashcards = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/getFlashcards");
+        const response = await fetch(serverEndpoint + "/api/getFlashcards");
         if (!response.ok) {
           throw new Error("Failed to fetch flashcards");
         }
-        const flashcardsData: any[] = await response.json();
-        const setNameData = flashcardsData.find((set) => set.name === setName);
-
-        if (setNameData && setNameData.cards) {
-          const cardsArray: Card[] = Object.keys(setNameData.cards).map(
-            (key) => ({
-              question: key,
-              answer: setNameData.cards[key],
-            })
-          );
-          setFlashcardSet({ name: setName, cards: cardsArray });
-        }
+        console.log(response)
+        const result = await response.json();
+        const flashcardSets = JSONToFlashcardSet(result);
+        const flashcardSetObject: flashcardSet = flashcardSets[0];
+        setFlashcardSet(flashcardSetObject);
+        console.log(flashcardSetObject);
       } catch (error) {
         console.error(error);
       }
-    }
+    };
 
     fetchFlashcards();
-  }, [setName]);
+  }, [setname]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -52,7 +36,7 @@ export const FlashCard = () => {
 
   const goToNextCard = () => {
     setCurrentCardIndex((prevIndex) =>
-      Math.min(prevIndex + 1, flashcardSet?.cards.length - 1 || 0)
+      Math.min(prevIndex + 1, flashcardSet?.flashcards.length - 1 || 0)
     );
   };
 
@@ -63,6 +47,8 @@ export const FlashCard = () => {
   if (!flashcardSet) {
     return <div>Loading flashcards...</div>;
   }
+
+  const currentCard = flashcardSet.flashcards[currentCardIndex];
 
   return (
     <>
@@ -76,10 +62,10 @@ export const FlashCard = () => {
             className={isFlipped ? "flipped" : ""}
           >
             <div id="thefront">
-              <p>{flashcardSet.cards[currentCardIndex].question}</p>
+              <p>{currentCard.question}</p>
             </div>
             <div id="theback">
-              <p>{flashcardSet.cards[currentCardIndex].answer}</p>
+              <p>{currentCard.answer}</p>
             </div>
           </div>
         </div>
@@ -92,12 +78,12 @@ export const FlashCard = () => {
             Prev
           </Button>
           <p>
-            Question: {currentCardIndex + 1} of {flashcardSet.cards.length}
+            Question: {currentCardIndex + 1} of {flashcardSet.flashcards.length}
           </p>
           <Button
             color="primary"
             onClick={goToNextCard}
-            disabled={currentCardIndex >= flashcardSet.cards.length - 1}
+            disabled={currentCardIndex >= flashcardSet.flashcards.length - 1}
           >
             Next
           </Button>

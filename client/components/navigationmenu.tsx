@@ -67,9 +67,11 @@ export function NavigationMenuDemo() {
           <NavigationMenuTrigger>Play with flashcards</NavigationMenuTrigger>
           <NavigationMenuContent className={dark}>
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[350px] lg:grid-cols-[.75fr_1fr]">
-              <ListItem href="/docs" title="stability stalwart">
-                Filters and searching
-              </ListItem>
+              <NextLink href='allSets'>
+                <ListItem title="stability stalwart">
+                  Filters and searching
+                </ListItem>
+              </NextLink>
               <NextLink href='displayFlashcardSet'>
                 <ListItem title="daredevil">
                   Randomized sets
