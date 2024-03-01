@@ -52,6 +52,12 @@ export interface flashcardSet {
     flashcards: flashcard []
 }
 
+export interface user {
+    userID: string
+    userName: string
+    favourites: string []
+}
+
 export const serverEndpoint = "http://localhost:5001"
 
 export function JSONToFlashcardSet(jsonData: any[]): flashcardSet[] {
