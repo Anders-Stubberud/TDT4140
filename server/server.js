@@ -17,7 +17,7 @@ let user;
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet } = require('./firebase.js')
+const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 app.use(cors())
 app.use(express.json());
@@ -52,9 +52,19 @@ app.get("/api/getFlashcard/:id", async (req, res) => {
     }
 })
 
+app.get("/api/getFavourites/:id", async (req, res) => {
+    try {
+        const data = await fetchFavourites(req.params.id);
+        res.send(data).status(200)
+    } catch (e) {
+        res.status(500).send(dbFail)
+        console.log(e)
+    }
+})
+
 app.delete("/api/deleteSet/:id", async (req, res) => {
     try {
-        await deleteSet(id);
+        await deleteSet(req.params.id);
         res.status(200).send(arr)
     } catch (error) {
         res.status(500).send()
@@ -62,15 +72,51 @@ app.delete("/api/deleteSet/:id", async (req, res) => {
     }
 })
 
+app.post("/api/updateSet", async (req, res) => {
+    try {
+        const set = req.body;
+        const setId = { flashcardSetID } = req.body;
+        await updateSet(setId, set);
+        res.status(200).send(arr);
+    } catch (e) {
+        res.status(500).send(dbFail);
+        console.log(e)
+    }
+})
+
+app.post("/api/setFavourite", async (req, res) => {
+    try {
+        const { userID } = req.body
+        const { flashcardSetID } = req.body
+        await pushFavourite(userID, flashcardSetID)
+    } catch (e) {
+        res.status(500).send(dbFail)
+        console.log(e)
+    }
+})
+
+app.post("/api/removeFavourite", async (req, res) => {
+    try {
+        const { userID } = req.body
+        const { flashcardSetID } = req.body
+        await removeFavourite(userID, flashcardSetID)
+    } catch (e) {
+        res.status(500).send(dbFail)
+        console.log(e)
+    }
+})
+
 app.post('/api/setupUser', async (req, res) => {
-    const user = req.body;
-    const { uid } = req.body
-    const userData = fetchData("user", uid)
-    const name = userData['name'];
-    const sets = userData['sets'];
-    const favourites = userData['favourites'];
-    user = new User(name, uid, sets, favourites);
-    res.status(200).send(arr)
+    const { userID } = req.body
+    const user = req.body
+
+    try {
+        await uploadUser(userID, user);
+        res.status(200).send(arr)
+    } catch (e) {
+        res.status(500).send(e)
+        console.log(e)
+    }
 })
 
 app.post('/api/uploadSet', async (req, res) => {

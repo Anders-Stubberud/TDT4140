@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -14,6 +14,8 @@ const firebaseConfig = {
 
 let app = initializeApp(firebaseConfig)
 let db = getFirestore(app);
+let flashcardSetCollection = "flashcardSets1"
+let userCollection = "users"
 
 const uploadData = async (col, sub, data) => {
     try {
@@ -26,7 +28,25 @@ const uploadData = async (col, sub, data) => {
 
 const uploadFlashcardSet = async (setId, data) => {
     try {
-        await setDoc(doc(db, "flashcardSets1", setId), data);
+        await setDoc(doc(db, flashcardSetCollection, setId), data);
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+const uploadUser = async (userID, data) => {
+    await setDoc(doc(db, userCollection, userID), data);
+}
+
+/**
+ * Update a set with new information
+ * 
+ * @param {*} setId 
+ * @param {*} data 
+ */
+const updateSet = async (setId, data) => {
+    try {
+        await setDoc(doc(db, flashcardSetCollection, setId), data, { merge: true });
     } catch (e) {
         console.log(e)
     }
@@ -34,7 +54,7 @@ const uploadFlashcardSet = async (setId, data) => {
 
 const flashcards = async () => {
     try {
-        const collectionRef = collection(db, 'flashcardSets1');
+        const collectionRef = collection(db, flashcardSetCollection);
         const querySnapshot = await getDocs(collectionRef);
         const documents = querySnapshot.docs.map(doc => doc.data());
         return documents;
@@ -44,12 +64,44 @@ const flashcards = async () => {
 }
 
 const fetchFlashcardSet = async (id) => {
-    return fetchData("flashcardSets1", id);
+    return fetchData(flashcardSetCollection, id);
 }
 
-const deleteSet = async (id) => {
-    await deleteDoc(doc(db, "flashcardSets1", id));
+const pushFavourite = async (userID, flashcardSetID) => {
+    await updateDoc(doc(db, userCollection, userID), {
+        favourites: arrayUnion(flashcardSetID)
+    })
 }
+
+const removeFavourite = async (userID, flashcardSetID) => {
+    await updateDoc(doc(db, userCollection, userID), {
+        favourites: arrayRemove(flashcardSetID)
+    })
+}
+
+const fetchFavourites = async (userID) => {
+    const user = await fetchData(userCollection, userID);
+    const { favourites } = user;
+
+    const flashcardSets = [];
+
+    for (const id of favourites) {
+        try {
+            const set = await fetchFlashcardSet(id);
+            flashcardSets.push(set);
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    return flashcardSets;
+};
+
+
+const deleteSet = async (id) => {
+    await deleteDoc(doc(db, flashcardSetCollection, id));
+}
+
 const fetchData = async (col, sub) => {
     try {
         const docRef = doc(db, col, sub);
@@ -72,18 +124,10 @@ module.exports = {
     flashcards,
     uploadFlashcardSet,
     fetchFlashcardSet,
-    deleteSet
+    deleteSet,
+    updateSet,
+    uploadUser,
+    pushFavourite,
+    removeFavourite,
+    fetchFavourites
 };
-
-
-const main = async () => {
-    try {
-        const collectionRef = collection(db, 'flashcardSets');
-        const querySnapshot = await getDocs(collectionRef);
-        const documents = querySnapshot.docs.map(doc => doc.data());
-    } catch (error) {
-        console.log(error)
-    }    
-};
-
-// main();
