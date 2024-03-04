@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Button } from "@nextui-org/button";
 import "../styles/flashcard.css";
-import { toggleSet, flashcard, flashcardSet, serverEndpoint, JSONToFlashcardSet } from "@/state/zustand";
+import { Progress } from "@nextui-org/react";
+import {
+  toggleSet,
+  flashcard,
+  flashcardSet,
+  serverEndpoint,
+  JSONToFlashcardSet,
+} from "@/state/zustand";
 
 export const FlashCard = () => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -16,10 +23,10 @@ export const FlashCard = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch flashcards");
         }
-        console.log(response)
+        console.log(response);
         const result = await response.json();
         const flashcardSets = JSONToFlashcardSet(result);
-        const flashcardSetObject: flashcardSet = flashcardSets[0];
+        const flashcardSetObject: flashcardSet = flashcardSets[1];
         setFlashcardSet(flashcardSetObject);
         console.log(flashcardSetObject);
       } catch (error) {
@@ -36,7 +43,7 @@ export const FlashCard = () => {
 
   const goToNextCard = () => {
     setCurrentCardIndex((prevIndex) =>
-      Math.min(prevIndex + 1, flashcardSet?.flashcards.length - 1 || 0)
+      Math.min(prevIndex + 1, flashcardSet?.flashcards.length ?? 0 - 1)
     );
   };
 
@@ -44,17 +51,38 @@ export const FlashCard = () => {
     setCurrentCardIndex((prevIndex) => Math.max(prevIndex - 1, 0));
   };
 
+  const markAsHard = () => {
+    if (!flashcardSet) {
+      return;
+    }
+
+    const newFlashcardSet = [...flashcardSet.flashcards];
+    const currentCard = newFlashcardSet[currentCardIndex];
+
+    //Removes(splice) the card from its current position and pushes it to the end
+    newFlashcardSet.splice(currentCardIndex, 1);
+    newFlashcardSet.push(currentCard);
+    setFlashcardSet({ ...flashcardSet, flashcards: newFlashcardSet });
+    setIsFlipped(false);
+  };
+
   if (!flashcardSet) {
     return <div>Loading flashcards...</div>;
   }
 
   const currentCard = flashcardSet.flashcards[currentCardIndex];
+  const progressValue =
+    ((currentCardIndex + 1) / flashcardSet.flashcards.length) * 100;
 
   return (
     <>
       <div id="wrapper">
         <p id="title">{flashcardSet.name}</p>
-        <div id="flashcardUpperSection"></div>
+        <div id="flashcardUpperSection">
+          <Button name="hardButton" color="primary" onClick={markAsHard}>
+            Mark as difficult
+          </Button>
+        </div>
         <div id="maincontainer">
           <div
             id="thecard"
@@ -77,9 +105,13 @@ export const FlashCard = () => {
           >
             Prev
           </Button>
-          <p>
-            Question: {currentCardIndex + 1} of {flashcardSet.flashcards.length}
-          </p>
+          <Progress
+            isStriped
+            arial-label="Progress"
+            color="warning"
+            value={progressValue}
+            className="max-w-md"
+          />
           <Button
             color="primary"
             onClick={goToNextCard}
