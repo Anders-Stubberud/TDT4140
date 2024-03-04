@@ -61,6 +61,7 @@
     "react-confetti-explosion": "^2.1.2",
     "react-dom": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
+    "react-heart": "^1.0.6",
     "react-router-dom": "^6.22.1",
     "react-social-login-buttons": "^3.9.1",
     "react-use": "^17.5.0",

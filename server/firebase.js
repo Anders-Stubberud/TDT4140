@@ -35,7 +35,18 @@ const uploadFlashcardSet = async (setId, data) => {
 }
 
 const uploadUser = async (userID, data) => {
-    await setDoc(doc(db, userCollection, userID), data);
+    await setDoc(doc(db, userCollection, userID), data, { merge: true});
+}
+
+const fetchUser = async (userID) => {
+    
+    const docSnap = await (getDoc(doc(db, userCollection, userID)))
+    
+    if (docSnap.exists()) {
+        return docSnap.data() //returns user
+    } else {
+        return null // user does not exist
+    }
 }
 
 /**
@@ -85,6 +96,10 @@ const fetchFavourites = async (userID) => {
 
     const flashcardSets = [];
 
+    if (favourites.length === 0) {
+        return flashcardSets
+    }
+
     for (const id of favourites) {
         try {
             const set = await fetchFlashcardSet(id);
@@ -129,5 +144,6 @@ module.exports = {
     uploadUser,
     pushFavourite,
     removeFavourite,
-    fetchFavourites
+    fetchFavourites,
+    fetchUser
 };

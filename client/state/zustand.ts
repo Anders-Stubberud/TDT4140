@@ -29,6 +29,16 @@ export const toggleDarkMode = create<darkMode>()((set) => ({
     setDark: (dark: string) => set({dark})
 }))
 
+interface userLoggedIn {
+    userID: string
+    setUserID: (userID: string) => void
+}
+
+export const useUserStore = create<userLoggedIn>()((set) => ({
+    userID: "",
+    setUserID: (newUserID: string) => set({ userID: newUserID })
+}))
+
 interface setInfo {
     setname: string
     setSet: (set: string) => void

@@ -26,6 +26,11 @@ export function SheetDemo() {
     const auth = getAuth();
     const [user] = useAuthState(auth);
 
+    const logOut = () => {
+        signOut(auth)
+        localStorage.removeItem('userID')
+    }
+
   return (
         <Sheet>
             <SheetTrigger asChild>
@@ -61,7 +66,7 @@ export function SheetDemo() {
                 </SheetFooter>
                 <div className="flex justify-center mt-64">
                     <NextLink href='/'>
-                        <Button onClick={() => signOut(auth)} type="submit" className="mt-28 bg-red-700">
+                        <Button onClick={() => logOut()} type="submit" className="mt-28 bg-red-700">
                             Log out
                         </Button>
                     </NextLink>

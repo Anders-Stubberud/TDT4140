@@ -17,7 +17,7 @@ let user;
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites } = require('./firebase.js')
+const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 app.use(cors())
 app.use(express.json());
@@ -111,8 +111,13 @@ app.post('/api/setupUser', async (req, res) => {
     const user = req.body
 
     try {
-        await uploadUser(userID, user);
+
+        if (!fetchUser(userID)) {
+            await uploadUser(userID, user);
+        }
+
         res.status(200).send(arr)
+        
     } catch (e) {
         res.status(500).send(e)
         console.log(e)
