@@ -1,40 +1,42 @@
 import { useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
 import { app } from "../firebase.js";
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { zustand } from "../state/zustand";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { zustand, useUserStore, user } from "../state/zustand";
 
 export default function Login() {
-
   const { setIsLoggedIn } = zustand();
+  const { setUserID } = useUserStore();
   const auth = getAuth();
   const [user] = useAuthState(auth);
-  const apiURL = 'http://localhost:5001/api';
+  const apiURL = "http://localhost:5001/api";
 
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
         try {
-          const response = await fetch(apiURL + '/setupUser', {
-            method: 'POST',
+          const response = await fetch(apiURL + "/setupUser", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              user
+              userID: user.uid,
+              userName: "",
+              favourites: [],
             }),
           });
           if (response.ok) {
+            localStorage.setItem('userID', user.uid)
             setIsLoggedIn(true);
-            console.log('punch')
           } else {
-            console.error('Failed to setup user:', response.statusText);
+            console.error("Failed to setup user:", response.statusText);
           }
         } catch (error) {
-          console.error('Error:', error);
+          console.error("Error:", error);
         }
       }
     };
@@ -47,7 +49,7 @@ export default function Login() {
       new firebaseui.auth.AuthUI(getAuth(app));
 
     ui.start("#firebaseui-auth-container", {
-      signInFlow: 'popup',
+      signInFlow: "popup",
       signInSuccessUrl: "/welcome",
       signInOptions: [
         {
@@ -67,7 +69,13 @@ export default function Login() {
     });
   }, []);
 
-  return <div className="mt-40"><div id="firebaseui-auth-container"></div>
-  <p className="mt-10">Please select <span className="italic">sign in with email</span> if <br></br>you have forgot your credentials.</p>
-  </div>;
+  return (
+    <div className="mt-40">
+      <div id="firebaseui-auth-container"></div>
+      <p className="mt-10">
+        Please select <span className="italic">sign in with email</span> if{" "}
+        <br></br>you have forgot your credentials.
+      </p>
+    </div>
+  );
 }
