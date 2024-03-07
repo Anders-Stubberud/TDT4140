@@ -1,8 +1,21 @@
-import React, { CSSProperties, useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import React, {
+  CSSProperties,
+  useEffect,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Button } from "@nextui-org/button";
 import { Progress, Spinner, card } from "@nextui-org/react";
 import { FlashcardArray } from "react-quizlet-flashcard";
-import { toggleSet, flashcard, flashcardSet, serverEndpoint, JSONToFlashcardSet } from "@/state/zustand";
+import {
+  toggleSet,
+  flashcard,
+  flashcardSet,
+  serverEndpoint,
+  JSONToFlashcardSet,
+} from "@/state/zustand";
 import "../styles/flashcard.css";
 
 interface FlashcardRef {
@@ -16,13 +29,17 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
   const [flashcardSet, setFlashcardSet] = useState<flashcardSet | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const { setname, setSet } = toggleSet();
-  const flashcardArrayRef = useRef<FlashcardRef>({ nextCard: () => {}, prevCard: () => {}, resetArray: () => {} })!;
+  const flashcardArrayRef = useRef<FlashcardRef>({
+    nextCard: () => {},
+    prevCard: () => {},
+    resetArray: () => {},
+  })!;
   const [cards, setCards] = useState<Flashcard[]>([]); // Use state to trigger re-render when cards change
 
   const defaultFrontContentStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
   interface Flashcard {
@@ -52,22 +69,31 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
       frontHTML: flashcard.question,
       backHTML: flashcard.answer,
       frontContentStyle: defaultFrontContentStyle,
-      backContentStyle: defaultFrontContentStyle
+      backContentStyle: defaultFrontContentStyle,
     }));
     setCards(newCardss);
     setIsFlipped(false);
   };
 
+  const randomizeFlashcards = (flashcardlist: Flashcard[]) => {
+    const copyList = [...flashcardlist];
+    for (let i = copyList.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copyList[i], copyList[j]] = [copyList[j], copyList[i]];
+    }
+    return copyList;
+  };
 
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
         console.log(setname);
         let response;
-        if (setname != 'stock') {
-          response = await fetch( serverEndpoint + `/api/getFlashcard/${setname}`);
-        }
-        else {
+        if (setname != "stock") {
+          response = await fetch(
+            serverEndpoint + `/api/getFlashcard/${setname}`
+          );
+        } else {
           response = await fetch(serverEndpoint + "/api/getFlashcards");
         }
         if (!response.ok) {
@@ -76,29 +102,35 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
         let result = await response.json();
         let flashcardSets = JSONToFlashcardSet(result);
         Object.keys(flashcardSets).length;
-        if (setname != 'stock') {
-          const flashcardSetObject = flashcardSets[0]
+        if (setname != "stock") {
+          const flashcardSetObject = flashcardSets[0];
           setFlashcardSet(flashcardSetObject);
-          const newCards: Flashcard[] = flashcardSetObject.flashcards.map((flashcard) => ({
-            id: num++,
-            frontHTML: flashcard.question,
-            backHTML: flashcard.answer,
-            frontContentStyle: defaultFrontContentStyle,
-            backContentStyle: defaultFrontContentStyle
-          }));
-          setCards(newCards);
-        }
-        else {
-          const flashcardSetObject = flashcardSets[Math.floor(Math.random() * Object.keys(flashcardSets).length)];
+          const newCards: Flashcard[] = flashcardSetObject.flashcards.map(
+            (flashcard) => ({
+              id: num++,
+              frontHTML: flashcard.question,
+              backHTML: flashcard.answer,
+              frontContentStyle: defaultFrontContentStyle,
+              backContentStyle: defaultFrontContentStyle,
+            })
+          );
+          setCards(randomizeFlashcards(newCards));
+        } else {
+          const flashcardSetObject =
+            flashcardSets[
+              Math.floor(Math.random() * Object.keys(flashcardSets).length)
+            ];
           setFlashcardSet(flashcardSetObject);
-          const newCards: Flashcard[] = flashcardSetObject.flashcards.map((flashcard) => ({
-            id: num++,
-            frontHTML: flashcard.question,
-            backHTML: flashcard.answer,
-            frontContentStyle: defaultFrontContentStyle,
-            backContentStyle: defaultFrontContentStyle
-          }));
-          setCards(newCards);
+          const newCards: Flashcard[] = flashcardSetObject.flashcards.map(
+            (flashcard) => ({
+              id: num++,
+              frontHTML: flashcard.question,
+              backHTML: flashcard.answer,
+              frontContentStyle: defaultFrontContentStyle,
+              backContentStyle: defaultFrontContentStyle,
+            })
+          );
+          setCards(randomizeFlashcards(newCards));
         }
         console.log(setname);
       } catch (error) {
@@ -146,26 +178,31 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
   const d: Flashcard[] = [
     {
       id: 1,
-      frontHTML: 'a',
+      frontHTML: "a",
       backContentStyle: defaultFrontContentStyle,
       frontContentStyle: defaultFrontContentStyle,
-      backHTML: 'k'
+      backHTML: "k",
     },
     {
       id: 2,
-      frontHTML: 'b',
+      frontHTML: "b",
       backContentStyle: defaultFrontContentStyle,
       frontContentStyle: defaultFrontContentStyle,
-      backHTML: 'k'
+      backHTML: "k",
     },
-  ]
+  ];
 
   const progressValue =
     ((currentCardIndex + 1) / flashcardSet.flashcards.length) * 100;
 
   return (
     <div>
-      <Button name="hardButton" color="primary" className="mb-5" onClick={markAsHard}>
+      <Button
+        name="hardButton"
+        color="primary"
+        className="mb-5"
+        onClick={markAsHard}
+      >
         Mark as difficult
       </Button>
       <div className=" flex flex-row items-center justify-center">
@@ -177,14 +214,17 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
         >
           <span className="text-2xl">&larr;</span>
         </Button>
-        <FlashcardArray controls={false} forwardRef={flashcardArrayRef} cards={cards} />
+        <FlashcardArray
+          controls={false}
+          forwardRef={flashcardArrayRef}
+          cards={cards}
+        />
         <Button
           onClick={goToNextCard}
           variant="ghost"
           className="border border-none"
           // disabled={currentCardIndex >= flashcardSet.flashcards.length - 1}
         >
-          
           <span className="text-2xl">&rarr;</span>
         </Button>
       </div>
