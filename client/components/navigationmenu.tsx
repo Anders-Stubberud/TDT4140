@@ -95,12 +95,8 @@ export function NavigationMenuDemo() {
           <NavigationMenuContent className={dark}>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {components.map((component) => (
-                <NextLink href={component.href}>
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                  >
+                <NextLink key={component.title} href={component.href}>
+                  <ListItem title={component.title} href={component.href}>
                     {component.description}
                   </ListItem>
                 </NextLink>
