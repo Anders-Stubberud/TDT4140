@@ -45,7 +45,9 @@ app.get("/api/getFlashcards", async (req, res) => {
 
 app.get("/api/getFlashcard/:id", async (req, res) => {
     try {
-        const data = await fetchFlashcardSet(req.params.id);
+        const flashcardId = req.params.id;
+        console.log(flashcardId)
+        const data = await fetchFlashcardSet(flashcardId);
         res.send(data);
     } catch (error) {
         console.log(error);
@@ -88,6 +90,7 @@ app.post("/api/setFavourite", async (req, res) => {
     try {
         const { userID } = req.body
         const { flashcardSetID } = req.body
+        console.log('puch')
         await pushFavourite(userID, flashcardSetID)
     } catch (e) {
         res.status(500).send(dbFail)
@@ -99,6 +102,7 @@ app.post("/api/removeFavourite", async (req, res) => {
     try {
         const { userID } = req.body
         const { flashcardSetID } = req.body
+        console.log('punch')
         await removeFavourite(userID, flashcardSetID)
     } catch (e) {
         res.status(500).send(dbFail)
@@ -124,6 +128,21 @@ app.post('/api/setupUser', async (req, res) => {
     }
 })
 
+app.post('/api/editUser', async (req, res) => {
+    const { data } = req.body;
+    const dat = req.body;
+    console.log(data);
+    console.log(dat);
+    // const user = req.body;
+    // const { uid } = req.body
+    // const userData = fetchData("user", uid)
+    // const name = userData['name'];
+    // const sets = userData['sets'];
+    // const favourites = userData['favourites'];
+    // user = new User(name, uid, sets, favourites);
+    res.status(200).send(arr)
+})
+
 app.post('/api/uploadSet', async (req, res) => {
     const { payload } = req.body;
     await uploadFlashcardSet(payload.flashcardSetID, payload);
@@ -132,3 +151,16 @@ app.post('/api/uploadSet', async (req, res) => {
 });
 
 app.listen(5001, () => {console.log("server startet")})
+
+
+const main = async (id) => {
+    try {
+        const data = await fetchData('users', 'AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
+        console.log(data); 
+    } catch (e) {
+        console.log(e)
+    }
+  };
+
+  const data = main('AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
+

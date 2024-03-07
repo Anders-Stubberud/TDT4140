@@ -7,8 +7,6 @@ import { DataTableDemo } from "@/components/scrollarea";
 
 export default function allSetsPage() {
 	return (
-		<div>
-			<FlashcardSetListDisplay></FlashcardSetListDisplay>
-		</div>
+		<FlashcardSetListDisplay></FlashcardSetListDisplay>
 	);
 }

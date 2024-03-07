@@ -1,20 +1,79 @@
-import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
-import { flashcard, flashcardSet } from '@/state/zustand';
+import { Card, CardBody, CardFooter, Image, Spinner } from "@nextui-org/react";
+import { flashcard, flashcardSet, serverEndpoint, useUserStore } from '@/state/zustand';
+import { ThreeDCardDemo } from "./threeDCard";
+import { PaginationDemo } from "./pagination";
+import { useEffect, useState } from "react";
+import FavouriteButton from "./favourite-button";
+import { getAuth } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useFavouriteSets } from "@/state/zustand";
 
 interface FlashcardSetListProps {
   flashcardSets: flashcardSet[];
+  number: number;
+  isLoading: boolean
 }
 
-const FlashcardSetList: React.FC<FlashcardSetListProps> = ({ flashcardSets }) => {
+const FlashcardSetList: React.FC<FlashcardSetListProps> = ({ flashcardSets, number, isLoading}) => {
+
+  // const [favourites, setFavourites] = useState<string []>([]);
+  const [index, setIndex] = useState<number>(0);
+  const { favourites, setFavourites } = useFavouriteSets();
+  const chunkArray = (array: any[], size: number) => {
+    return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
+      array.slice(index * size, index * size + size)
+    );
+  };
+
+  const fetchData = async () => {
+    try {
+      const userID = localStorage.getItem('userID');
+      console.log('test' + userID);
+      const response = await fetch(`${serverEndpoint}/api/getFavourites/${userID}`);
+      const data = await response.json();
+      const favs: string[] = [];
+      for (let i=0; i < Object.keys(data).length; i++) {
+        favs.push(data[i].flashcardSetID)
+      } 
+      setFavourites(favs);
+      console.log(favs);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Trigger on render
+  }, []); // Empty dependency array means it runs once on mount
+  
+
+  const flashcardSetsGroups = chunkArray(flashcardSets, 3);
+
     return (
-        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-          {flashcardSets.map((flashcardSet, index) => (
-            <Card shadow="sm" key={index} isPressable onPress={() => console.log("item pressed")} className="p-6">
-              <CardBody className="overflow-visible p-0">
-                      <p>{flashcardSet.name}</p>
-              </CardBody>
-            </Card>
-            ))}
+        <div>
+          {isLoading ?
+            <Spinner></Spinner>
+          :
+          <div>
+          <div className="flex justify-between">
+            {flashcardSetsGroups[index].map((flashcardSet, index) => (
+              <div key={index}  className="ml-10 mr-10">
+                <ThreeDCardDemo
+                id = {flashcardSet.flashcardSetID}
+                title={flashcardSet.name}
+                imageUrl ={`https://source.unsplash.com/random?dummy=${Math.floor(1000000 + Math.random() * 9000000)}`}
+                description="description"
+                buttonText="Play"
+                favourite={favourites.includes(flashcardSet.flashcardSetID)}
+              ></ThreeDCardDemo>
+              </div>
+              ))}
+          </div>
+          <div className="mt-10">
+            <PaginationDemo number={number} index={index} setIndex={setIndex}></PaginationDemo>
+          </div>
+        </div>
+          }
         </div>
     );
 };

@@ -1,14 +1,15 @@
 "use client";
 
 import { serverEndpoint } from "@/state/zustand";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 // @ts-ignore
 import Heart from "react-heart";
+import { useFavouriteSets } from "@/state/zustand";
 
 interface FavouriteButtonProps {
   flashcardSetID: string;
   isFavorite: boolean;
-  userID: string;
+  userID: string | undefined;
 }
 
 function FavouriteButton({
@@ -18,13 +19,18 @@ function FavouriteButton({
 }: FavouriteButtonProps) {
   const [active, setActive] = useState(isFavorite);
 
-  useEffect(() => {
-    setActive(isFavorite);
-  }, [isFavorite]);
+  const { favourites, setFavourites } = useFavouriteSets();
 
   const handleToggleFavorite = async () => {
     try {
-      if (isFavorite) {
+      if (favourites.includes(flashcardSetID)) {
+        const newarr: string [] = [];
+        for (let i=0; i<favourites.length; i++) {
+          if (favourites[i] != flashcardSetID) {
+            newarr.push(favourites[i])
+          }
+        }
+        setFavourites(newarr);
         setActive(!active);
         // Remove from favorites
         await fetch(`${serverEndpoint}/api/removeFavourite`, {
@@ -38,6 +44,7 @@ function FavouriteButton({
           }),
         });
       } else {
+        setFavourites([...favourites, flashcardSetID])
         setActive(active);
         // Add to favorites
         await fetch(`${serverEndpoint}/api/setFavourite`, {
@@ -58,7 +65,7 @@ function FavouriteButton({
 
   return (
     <div style={{ width: "1.3rem" }}>
-      <Heart isActive={active} onClick={handleToggleFavorite} />
+      <Heart isActive={favourites.includes(flashcardSetID)} onClick={handleToggleFavorite} />
     </div>
   );
 }

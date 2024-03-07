@@ -17,7 +17,6 @@ import { link as linkStyles } from "@nextui-org/theme";
 
 import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
-import clsx from "clsx";
 import { SheetDemo } from "./sheet";
 import { useEffect } from "react";
 import { zustand } from "../state/zustand";
@@ -37,12 +36,20 @@ import { signOut } from "firebase/auth";
 import { Bot } from "lucide-react";
 import { NavigationMenuDemo } from "./navigationmenu";
 import { AvatarDemo } from "./avatar";
+import { Button } from "./ui/button";
+import { useUserStore } from "../state/zustand";
+
 export const LoggedInNavbar = () => {
 
   const app = initializeApp(firebaseConfig);
   const {setIsLoggedIn} = zustand();
   const auth = getAuth();
   const [user] = useAuthState(auth);
+  const { setUserID } = useUserStore();
+
+  useEffect(() => {
+      setUserID(user?.uid);
+  }, [])
 
   const searchInput = (
     <Input

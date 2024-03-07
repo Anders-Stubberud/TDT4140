@@ -1,11 +1,12 @@
 "use client";
 
 import { title } from "@/components/primitives";
+import { AnimatedTooltipPreview } from "@/components/us";
 
 export default function DocsPage() {
 	return (
 		<div>
-			<h1 className={title()}>Docs</h1>
+			<AnimatedTooltipPreview></AnimatedTooltipPreview>
 		</div>
 	);
 }
