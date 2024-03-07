@@ -10,7 +10,10 @@ const nextConfig = {
         messagingSenderId: "754929424468",
         appId: "1:754929424468:web:8d4d120dc99b20050cf5c1",
         measurementId: "G-89FPG56HX9"
-    }
+    },
+    images: {
+        domains: ['images.unsplash.com', 'source.unsplash.com'],
+    },
 
 }
 

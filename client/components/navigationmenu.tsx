@@ -15,7 +15,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+} from "@/components/ui/navigation-menu"
+import { toggleSet } from "../state/zustand"
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -57,6 +58,7 @@ const components: { title: string; href: string; description: string }[] = [
 export function NavigationMenuDemo() {
   const { dark } = toggleDarkMode();
   const router = useRouter();
+  const { setname, setSet } = toggleSet();
 
   return (
     <NavigationMenu className="ml-5">
@@ -66,19 +68,25 @@ export function NavigationMenuDemo() {
           <NavigationMenuContent className={dark}>
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[350px] lg:grid-cols-[.75fr_1fr]">
               <NextLink href="allSets">
+              <ListItem href="/docs/primitives/typography" title="routine resistor">
+                View all sets
+              </ListItem>
+              </NextLink>
+              <NextLink href="allSets">
                 <ListItem title="stability stalwart">
                   Filters and searching
                 </ListItem>
               </NextLink>
-              <NextLink href="displayFlashcardSet">
-                <ListItem title="daredevil">Randomized sets</ListItem>
+              <NextLink href='displayFlashcardSet'>
+                <ListItem title="daredevil" onClick={() => setSet('stock')}>
+                  Randomized sets
+                </ListItem>
               </NextLink>
-              <NextLink href={"/favourites"}>
-                <ListItem title="Your favourite sets">View all sets</ListItem>
+              <NextLink href='favourites'>
+                <ListItem title="me-centric master">
+                  Your favourite sets
+                </ListItem>
               </NextLink>
-              <ListItem href="/docs/primitives/path" title="me-centric master">
-                Sets you've created
-              </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>

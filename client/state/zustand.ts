@@ -1,13 +1,5 @@
+import { CSSProperties } from 'react'
 import { create } from 'zustand'
-
-//   import { User, getAuth } from "firebase/auth";
-//   import { useAuthState } from "react-firebase-hooks/auth";
-//   import { initializeApp } from "firebase/app";
-//   import { firebaseConfig } from "../firebase.js";
-
-//   const app = initializeApp(firebaseConfig);
-//   const auth = getAuth();
-//   const [user] = useAuthState(auth);
 
 interface userState {
     isLoggedIn: boolean
@@ -29,14 +21,23 @@ export const toggleDarkMode = create<darkMode>()((set) => ({
     setDark: (dark: string) => set({dark})
 }))
 
+interface favourite_sets {
+    favourites: string [];
+    setFavourites: (favourites: string []) => void
+}
+
+export const useFavouriteSets = create<favourite_sets>()((set) => ({
+    favourites: [],
+    setFavourites: (favourites: string[]) => set({favourites})
+}))
 interface userLoggedIn {
-    userID: string
-    setUserID: (userID: string) => void
+    userID: string | undefined;
+    setUserID: (userID: string | undefined) => void
 }
 
 export const useUserStore = create<userLoggedIn>()((set) => ({
     userID: "",
-    setUserID: (newUserID: string) => set({ userID: newUserID })
+    setUserID: (newUserID: string | undefined) => set({ userID: newUserID })
 }))
 
 interface setInfo {
@@ -45,9 +46,10 @@ interface setInfo {
 }
 
 export const toggleSet = create<setInfo>()((set) => ({
-    setname: 'hovesteder',
+    setname: 'stock',
     setSet: (setname: string) => set({setname})
 }))
+
 
 export interface flashcard {
     flashcardID: string
@@ -70,7 +72,20 @@ export interface user {
 
 export const serverEndpoint = "http://localhost:5001"
 
-export function JSONToFlashcardSet(jsonData: any[]): flashcardSet[] {
+export function JSONToFlashcardSet(jsonData: any): flashcardSet[] {
+    console.log(jsonData);
+    if (!Array.isArray(jsonData)) {
+      return [{
+        flashcardSetID: jsonData.flashcardSetID,
+        name: jsonData.name,
+        creatorID: jsonData.creatorID,
+        flashcards: jsonData.flashcards.map((card: any) => ({
+          flashcardID: card.flashcardID,
+          question: card.question,
+          answer: card.answer 
+        }))
+      }];
+    }
     return jsonData.map((data: any) => ({
       flashcardSetID: data.flashcardSetID,
       name: data.name,
@@ -82,3 +97,14 @@ export function JSONToFlashcardSet(jsonData: any[]): flashcardSet[] {
       }))
     }));
   }
+  
+
+export interface userInfo {
+    profilePic: File | null
+    setProfilePic: (pic: File) => void
+}
+
+export const changeUserInfo = create<userInfo>()((set) => ({
+    profilePic: null,
+    setProfilePic: (profilePic: File) => set({profilePic})
+}))
