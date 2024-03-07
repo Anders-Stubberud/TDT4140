@@ -35,6 +35,30 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
 
   let num = 1;
 
+  const markAsHard = () => {
+    if (!flashcardSet) {
+      return;
+    }
+    console.log(flashcardSet.flashcards);
+    const newFlashcardSet = [...flashcardSet.flashcards];
+    const currentCard = newFlashcardSet[currentCardIndex];
+
+    //Removes(splice) the card from its current position and pushes it to the end
+    newFlashcardSet.splice(currentCardIndex, 1);
+    newFlashcardSet.push(currentCard);
+    setFlashcardSet({ ...flashcardSet, flashcards: newFlashcardSet });
+    const newCardss: Flashcard[] = newFlashcardSet.map((flashcard) => ({
+      id: num++,
+      frontHTML: flashcard.question,
+      backHTML: flashcard.answer,
+      frontContentStyle: defaultFrontContentStyle,
+      backContentStyle: defaultFrontContentStyle
+    }));
+    setCards(newCardss);
+    setIsFlipped(false);
+  };
+
+
   useEffect(() => {
     const fetchFlashcards = async () => {
       try {
@@ -141,6 +165,9 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
 
   return (
     <div>
+      <Button name="hardButton" color="primary" className="mb-5" onClick={markAsHard}>
+        Mark as difficult
+      </Button>
       <div className=" flex flex-row items-center justify-center">
         <Button
           variant="ghost"
