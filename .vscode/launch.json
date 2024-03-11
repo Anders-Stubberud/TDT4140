@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/johan/Downloads/lab-l2-handin/kernel",
+      "program": "/Users/johan/Downloads/lab-l2-handin/kernel/build/Debug/outDebug"
+    }
+  ]
+}
