@@ -64,9 +64,10 @@ app.get("/api/getFavourites/:id", async (req, res) => {
     }
 })
 
-app.delete("/api/deleteSet/:id", async (req, res) => {
+app.post("/api/deleteSet", async (req, res) => {
     try {
-        await deleteSet(req.params.id);
+        const { flashcardSetID } = req.body;
+        await deleteSet(flashcardSetID);
         res.status(200).send(arr)
     } catch (error) {
         res.status(500).send()

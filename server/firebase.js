@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, where, query, deleteDoc } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -85,9 +85,29 @@ const pushFavourite = async (userID, flashcardSetID) => {
 }
 
 const removeFavourite = async (userID, flashcardSetID) => {
-    await updateDoc(doc(db, userCollection, userID), {
-        favourites: arrayRemove(flashcardSetID)
-    })
+    const userRef = doc(db, userCollection, userID);
+        if (!userRef) {
+            console.error("Invalid user reference");
+            return;
+        }
+
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            
+            if (userData && userData.favourites) {
+                const updatedFavourites = userData.favourites.filter(id => id !== flashcardSetID);
+
+                await updateDoc(userRef, {
+                    favourites: updatedFavourites
+                });
+            } else {
+                console.error("Favourites field is missing or null");
+            }
+        } else {
+            console.error("User document does not exist");
+        }
 }
 
 const fetchFavourites = async (userID) => {
@@ -113,8 +133,19 @@ const fetchFavourites = async (userID) => {
 };
 
 
-const deleteSet = async (id) => {
-    await deleteDoc(doc(db, flashcardSetCollection, id));
+const deleteSet = async (flashcardSetID) => {
+    const q = query(collection(db, userCollection), where("favourites", "array-contains", flashcardSetID));
+    try {
+        const querySnapshot = await getDocs(q);
+        for (const doc of querySnapshot.docs) {
+            const user = doc.data();
+            await removeFavourite(user.userID, flashcardSetID);
+        }
+
+        await deleteDoc(doc(db, flashcardSetCollection, flashcardSetID));
+    } catch (error) {
+        console.error("Error querying and removing flashcard set:", error);
+    }
 }
 
 const fetchData = async (col, sub) => {
