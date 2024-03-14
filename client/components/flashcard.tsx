@@ -17,6 +17,7 @@ import {
   JSONToFlashcardSet,
 } from "@/state/zustand";
 import "../styles/flashcard.css";
+// @ts-ignore
 import ReactCardFlip from "react-card-flip";
 import { useRouter } from "next/navigation";
 import ConfettiExplosion from "react-confetti-explosion";
