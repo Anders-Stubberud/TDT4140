@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, where, query, deleteDoc } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, where, query, deleteDoc, where, query, deleteDoc } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -112,9 +112,14 @@ const removeFavourite = async (userID, flashcardSetID) => {
 
 const fetchFavourites = async (userID) => {
     const user = await fetchData(userCollection, userID);
-    const { favourites } = user;
 
     const flashcardSets = [];
+    
+    if (!user) {
+        return flashcardSets;
+    }
+
+    const { favourites: favourites = [] } = user;
 
     if (favourites.length === 0) {
         return flashcardSets
@@ -132,6 +137,16 @@ const fetchFavourites = async (userID) => {
     return flashcardSets;
 };
 
+
+const fetchFlashcardSetsBySearch = async(searchTerm) => {
+
+    const data = await flashcards()
+    if (searchTerm.length === 0) {
+        return data
+    }
+    const matchedElements = data.filter(set => set.name && set.name.includes(searchTerm))
+    return matchedElements
+}
 
 const deleteSet = async (flashcardSetID) => {
     const q = query(collection(db, userCollection), where("favourites", "array-contains", flashcardSetID));
@@ -171,6 +186,7 @@ module.exports = {
     uploadFlashcardSet,
     fetchFlashcardSet,
     deleteSet,
+    fetchFlashcardSetsBySearch,
     updateSet,
     uploadUser,
     pushFavourite,
