@@ -9,7 +9,7 @@ interface TrashCanIconProps {
 }
 
 export const TrashCanIcon: FC<TrashCanIconProps> = ({
-  fill = "currentColor",
+  fill = 'currentColor',
   size,
   height,
   width,

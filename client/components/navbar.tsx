@@ -43,7 +43,7 @@ export const Navbar = () => {
   const [user] = useAuthState(auth);
 
   return (
-    <div>
+    <div className="sticky top-0 z-50 bg-white">
       {
         user?
         <LoggedInNavbar></LoggedInNavbar>

@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import React, { Dispatch, SetStateAction, useEffect } from "react";
+import {Image} from "@nextui-org/react";
+import NextImage from "next/image";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { toggleSet, useUserStore, zustand } from "@/state/zustand";
 import NextLink from "next/link";
@@ -11,6 +12,7 @@ import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Button } from "@nextui-org/button";
 import { serverEndpoint } from "@/state/zustand";
+import { Spinner } from "@nextui-org/react";
 import { FlashCard } from "./flashcard";
 import { Flashcard } from "react-quizlet-flashcard";
 import {
@@ -49,6 +51,7 @@ export function ThreeDCardDemo({
   const { setUserID } = useUserStore();
   const auth = getAuth();
   const [user] = useAuthState(auth);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const handleDelete = async () => {
     try {
@@ -107,7 +110,7 @@ export function ThreeDCardDemo({
           translateZ="50"
           className="text-xl font-bold text-neutral-600 dark:text-white mx-auto"
         >
-          {title}
+        { title }
         </CardItem>
         <CardItem
           as="p"
@@ -117,8 +120,9 @@ export function ThreeDCardDemo({
           {description}
         </CardItem>
         <CardItem translateZ="100" className="w-full mt-4">
-          <Image
+        <Image
             src={imageUrl}
+            as={NextImage}
             height="1000"
             width="1000"
             className="h-44 w-full object-cover rounded-xl group-hover/card:shadow-xl"
