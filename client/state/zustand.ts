@@ -50,17 +50,33 @@ export const toggleSet = create<setInfo>()((set) => ({
     setSet: (setname: string) => set({setname})
 }))
 
+interface chosenSet {
+    sett: any[]
+    setSett: (sett: any[]) => void
+}
+
+export const changeChosenSet = create<chosenSet>()((set) => ({
+    sett: [],
+    setSett: (sett: any[]) => set({sett})
+}))
+
 
 export interface flashcard {
+    questionImageURL: string | null
+    answerImageURL: string | null
     flashcardID: string
     question: string
     answer: string
 }
 
 export interface flashcardSet {
+    coverImage: File | undefined
+    numberOfLikes: number
     flashcardSetID: string
-    name: string
-    creatorID: string
+    setTitle: string
+    description: string
+    tags: string []
+    creatorID: string | null
     flashcards: flashcard []
 }
 
@@ -76,24 +92,36 @@ export function JSONToFlashcardSet(jsonData: any): flashcardSet[] {
     console.log(jsonData);
     if (!Array.isArray(jsonData)) {
       return [{
+        coverImage: jsonData.coverImage,
+        description: jsonData.description,
+        tags: jsonData.tags,
+        numberOfLikes: jsonData.numberOfLikes,
         flashcardSetID: jsonData.flashcardSetID,
-        name: jsonData.name,
+        setTitle: jsonData.setTitle,
         creatorID: jsonData.creatorID,
         flashcards: jsonData.flashcards.map((card: any) => ({
           flashcardID: card.flashcardID,
           question: card.question,
-          answer: card.answer 
+          answer: card.answer,
+          answerImage: card.answerImage,
+          questionImage: card.questionImage 
         }))
       }];
     }
     return jsonData.map((data: any) => ({
-      flashcardSetID: data.flashcardSetID,
-      name: data.name,
-      creatorID: data.creatorID,
-      flashcards: data.flashcards.map((card: any) => ({
-        flashcardID: card.flashcardID,
-        question: card.question,
-        answer: card.answer
+        coverImage: data.coverImage,
+        description: data.description,
+        tags: data.tags,
+        numberOfLikes: data.numberOfLikes,
+        flashcardSetID: data.flashcardSetID,
+        setTitle: data.setTitle,
+        creatorID: data.creatorID,
+        flashcards: data.flashcards.map((card: any) => ({
+            flashcardID: card.flashcardID,
+            question: card.question,
+            answer: card.answer,
+            answerImage: card.answerImage,
+            questionImage: card.questionImage 
       }))
     }));
   }
@@ -107,4 +135,14 @@ export interface userInfo {
 export const changeUserInfo = create<userInfo>()((set) => ({
     profilePic: null,
     setProfilePic: (profilePic: File) => set({profilePic})
+}))
+
+export interface createCards {
+    cardFormArr: any []
+    setCardFormArr: (cardFormArr: any[]) => void
+}
+
+export const changeCardsForm = create<createCards>()((set) => ({
+    cardFormArr: [],
+    setCardFormArr: (cardFormArr: any []) => set({cardFormArr})
 }))

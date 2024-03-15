@@ -15,12 +15,16 @@ import {
   flashcardSet,
   serverEndpoint,
   JSONToFlashcardSet,
+  changeChosenSet
 } from "@/state/zustand";
 import "../styles/flashcard.css";
 // @ts-ignore
 import ReactCardFlip from "react-card-flip";
 import { useRouter } from "next/navigation";
 import ConfettiExplosion from "react-confetti-explosion";
+import {Image} from "@nextui-org/react";
+import NextImage from "next/image";
+import Confetti from 'react-confetti-boom';
 
 interface FlashcardRef {
   nextCard: () => void;
@@ -29,7 +33,7 @@ interface FlashcardRef {
 }
 
 export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
-  const [flashcardSet, setFlashcardSet] = useState<flashcardSet | null>(null);
+  // const [flashcardSet, setFlashcardSet] = useState<flashcardSet | null>(null);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const { setname, setSet } = toggleSet();
   const flashcardArrayRef = useRef<FlashcardRef>({
@@ -38,6 +42,7 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     resetArray: () => {},
   })!;
 
+  const { sett, setSett } = changeChosenSet();
   const [cards, setCards] = useState<Flashcard[]>([]); // Use state to trigger re-render when cards change
   const [isFlipped, setIsFlipped] = useState(false);
   const router = useRouter();
@@ -57,6 +62,8 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     id: number;
     frontHTML: string | JSX.Element;
     backHTML: string | JSX.Element;
+    frontImageURL: string | undefined;
+    backImageURL: string | undefined;
     frontContentStyle: CSSProperties | undefined;
     backContentStyle: CSSProperties | undefined;
   }
@@ -64,82 +71,31 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
   let num = 1;
 
   useEffect(() => {
-    const fetchFlashcards = async () => {
-      try {
-        console.log(setname);
-        let response;
-        if (setname != "stock") {
-          response = await fetch(
-            serverEndpoint + `/api/getFlashcard/${setname}`
-          );
-        } else {
-          response = await fetch(serverEndpoint + "/api/getFlashcards");
-        }
-        if (!response.ok) {
-          throw new Error("Failed to fetch flashcards");
-        }
-        let result = await response.json();
-        let flashcardSets = JSONToFlashcardSet(result);
-        Object.keys(flashcardSets).length;
-        if (setname != "stock") {
-          const flashcardSetObject = flashcardSets[0];
-          setFlashcardSet(flashcardSetObject);
-          const newCards: Flashcard[] = flashcardSetObject.flashcards.map(
-            (flashcard) => ({
-              id: num++,
-              frontHTML: flashcard.question,
-              backHTML: flashcard.answer,
-              frontContentStyle: defaultFrontContentStyle,
-              backContentStyle: defaultFrontContentStyle,
-            })
-          );
-          setCards(newCards);
-        } else {
-          const flashcardSetObject =
-            flashcardSets[
-              Math.floor(Math.random() * Object.keys(flashcardSets).length)
-            ];
-          setFlashcardSet(flashcardSetObject);
-          const newCards: Flashcard[] = flashcardSetObject.flashcards.map(
-            (flashcard) => ({
-              id: num++,
-              frontHTML: flashcard.question,
-              backHTML: flashcard.answer,
-              frontContentStyle: defaultFrontContentStyle,
-              backContentStyle: defaultFrontContentStyle,
-              isFlipped: false,
-            })
-          );
-          setCards(newCards);
-        }
-        console.log(setname);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchFlashcards();
-  }, [setname]);
-
-  // const populateCards = (flashcardSet: flashcardSet): void => {
-  //   const newCards: Flashcard[] = flashcardSet.flashcards.map((flashcard) => ({
-  //     id: num++,
-  //     frontHTML: flashcard.question,
-  //     backHTML: flashcard.answer,
-  //     frontContentStyle: defaultFrontContentStyle,
-  //     backContentStyle: defaultFrontContentStyle,
-  //   }));
-  //   console.log(newCards);
-  //   setCards(randomizeFlashcards(newCards));
-  // };
+    console.log(sett);
+    const chosenSet = setname !== 'stock' ? sett.find(card => card.flashcardSetID === setname) : sett[Math.floor(Math.random() * sett.length)];
+    const newCards: Flashcard[] = chosenSet.flashcards.map(
+      (flashcard: any) => ({
+        id: num++,
+        frontHTML: flashcard.question,
+        backHTML: flashcard.answer,
+        frontImageURL: flashcard.questionImage,
+        backImageURL: flashcard.answerImage,
+        frontContentStyle: defaultFrontContentStyle,
+        backContentStyle: defaultFrontContentStyle,
+        isFlipped: false,
+      })
+    );
+    setCards(newCards);
+    console.log(newCards);
+  }, []);
 
   const goToNextCard = () => {
     setTimeout(() => {
-      if (currentCardIndex < flashcardSet.flashcards.length - 1) {
+      if (currentCardIndex < cards.length - 1) {
         flashcardArrayRef.current?.nextCard();
         setIsFlipped(false);
         setCurrentCardIndex((prevIndex) =>
-          Math.min(prevIndex + 1, flashcardSet.flashcards.length - 1)
+          Math.min(prevIndex + 1, cards.length - 1)
         );
         setDisplayedCardIndex(currentCardIndex);
       } else {
@@ -201,7 +157,7 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     if (flashcardArrayRef.current) {
       flashcardArrayRef.current.resetArray();
     }
-  }, [flashcardSet]);
+  }, [cards]);
 
   useEffect(() => {
     if (isExploding) {
@@ -211,34 +167,41 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     }
   }, [isExploding]);
 
-  if (!flashcardSet) {
+  if (!cards) {
     return <Spinner></Spinner>;
   }
 
-  const d: Flashcard[] = [
-    {
-      id: 1,
-      frontHTML: "a",
-      backContentStyle: defaultFrontContentStyle,
-      frontContentStyle: defaultFrontContentStyle,
-      backHTML: "k",
-    },
-    {
-      id: 2,
-      frontHTML: "b",
-      backContentStyle: defaultFrontContentStyle,
-      frontContentStyle: defaultFrontContentStyle,
-      backHTML: "k",
-    },
-  ];
+  // const d: Flashcard[] = [
+  //   {
+  //     id: 1,
+  //     frontHTML: "a",
+  //     backContentStyle: defaultFrontContentStyle,
+  //     frontContentStyle: defaultFrontContentStyle,
+  //     backHTML: "k",
+  //   },
+  //   {
+  //     id: 2,
+  //     frontHTML: "b",
+  //     backContentStyle: defaultFrontContentStyle,
+  //     frontContentStyle: defaultFrontContentStyle,
+  //     backHTML: "k",
+  //   },
+  // ];
 
   const progressValue =
-    ((currentCardIndex + 1) / flashcardSet.flashcards.length) * 100;
+    ((currentCardIndex + 1) / cards.length) * 100;
 
   if (isFinished) {
     return (
       <div>
-        {isExploding && <ConfettiExplosion />}
+        <Confetti 
+          mode="boom" effectCount={3} effectInterval={1000} particleCount={1000}
+          colors={['#ff577f', '#ff884b', '#ffd384', '#fff9b0', '#3498db']}
+          y={0.6}
+          deg={270}
+          shapeSize={8}
+          spreadDeg={45}
+        />
         <div className="text-center text-4xl font-bold mt-5">
           Congratulations! You have finished the set!
         </div>
@@ -254,7 +217,7 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     );
   }
 
-  if (currentCardIndex === flashcardSet.flashcards.length - 1) {
+  if (currentCardIndex === cards.length - 1) {
     return (
       <div>
         <Button
@@ -277,10 +240,34 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
 
           <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical">
             <div className="card" onClick={handleClick}>
+              {
+                cards[currentCardIndex]?.frontImageURL && (
+                  <Image
+                    src={cards[currentCardIndex]?.frontImageURL}
+                    as={NextImage}
+                    height="1000"
+                    width="1000"
+                    className="h-44 w-full object-cover rounded-xl group-hover/card:shadow-xl"
+                    alt="thumbnail"
+                  />
+                )
+              }
               {cards[currentCardIndex]?.frontHTML}
             </div>
 
             <div className="card" onClick={handleClick}>
+              {
+                cards[currentCardIndex]?.backImageURL && (
+                  <Image
+                    src={cards[currentCardIndex]?.backImageURL}
+                    as={NextImage}
+                    height="1000"
+                    width="1000"
+                    className="h-44 w-full object-cover rounded-xl group-hover/card:shadow-xl"
+                    alt="thumbnail"
+                  />
+                )
+              }
               {cards[currentCardIndex]?.backHTML}
             </div>
           </ReactCardFlip>
@@ -336,14 +323,38 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
         </Button>
 
         <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical">
-          <div className="card" onClick={handleClick}>
-            {cards[currentCardIndex]?.frontHTML}
-          </div>
+            <div className="card" onClick={handleClick}>
+              {
+                cards[currentCardIndex]?.frontImageURL && (
+                  <Image
+                    src={cards[currentCardIndex]?.frontImageURL}
+                    as={NextImage}
+                    height="1000"
+                    width="1000"
+                    className="h-44 w-full object-cover rounded-xl group-hover/card:shadow-xl"
+                    alt="thumbnail"
+                  />
+                )
+              }
+              {cards[currentCardIndex]?.frontHTML}
+            </div>
 
-          <div className="card" onClick={handleClick}>
-            {cards[currentCardIndex]?.backHTML}
-          </div>
-        </ReactCardFlip>
+            <div className="card" onClick={handleClick}>
+              {
+                cards[currentCardIndex]?.backImageURL && (
+                  <Image
+                    src={cards[currentCardIndex]?.backImageURL}
+                    as={NextImage}
+                    height="1000"
+                    width="1000"
+                    className="h-44 w-full object-cover rounded-xl group-hover/card:shadow-xl"
+                    alt="thumbnail"
+                  />
+                )
+              }
+              {cards[currentCardIndex]?.backHTML}
+            </div>
+          </ReactCardFlip>
 
         <Button
           onClick={goToNextCard}

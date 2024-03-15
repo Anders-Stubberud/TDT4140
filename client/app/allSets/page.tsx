@@ -17,7 +17,7 @@ export default function allSetsPage() {
   return (
     <div>
       <div style={{ padding: '20px' }}>
-      <SearchBar setData={setData} setNum ={setNum} setIsLoading={setIsLoading}/>
+      <SearchBar data={data} setData={setData} setNum ={setNum} setIsLoading={setIsLoading}/>
       </div>
       <FlashcardSetList flashcardSets={data} number={num} isLoading={isLoading} />
     </div>

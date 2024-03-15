@@ -12,7 +12,7 @@ const nextConfig = {
         measurementId: "G-89FPG56HX9"
     },
     images: {
-        domains: ['images.unsplash.com', 'source.unsplash.com'],
+        domains: ['images.unsplash.com', 'source.unsplash.com', 'storage.googleapis.com', 'firebasestorage.googleapis.com'],
     },
 
 }

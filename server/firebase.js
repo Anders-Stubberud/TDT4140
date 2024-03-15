@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, where, query, deleteDoc, where, query, deleteDoc } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, query, deleteDoc, where } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 let app = initializeApp(firebaseConfig)
 let db = getFirestore(app);
-let flashcardSetCollection = "flashcardSets1"
+let flashcardSetCollection = "flashcardSets2"
 let userCollection = "users"
 
 const uploadData = async (col, sub, data) => {
@@ -178,6 +178,16 @@ const fetchData = async (col, sub) => {
         console.log(error)
     }
 }
+
+// const main = async (id) => {
+//     try {
+//         console.log(flashcards())
+//     } catch (e) {
+//         console.log(e)
+//     }
+//   };
+
+//   const data = main('AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
 
 module.exports = {
     uploadData,

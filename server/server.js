@@ -15,29 +15,41 @@ const dbFail = {
 // Not in use?
 let user;
 
+const { Storage } = require("@google-cloud/storage");
 const express = require('express')
 const cors = require('cors')
-const app = express()
+const multer = require('multer');
+const app = express();
+const port = 5001;
+const mults = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 1000 * 1024 * 1024,
+  },
+});
+app.use(cors());
+const cloudStorage = new Storage({
+  keyFilename: `${__dirname}/serviceAccount.json`,
+  projectId: "flashy-3a502",
+});
+const bucketName = "gs://flashy-3a502.appspot.com";
+const bucket = cloudStorage.bucket(bucketName);
 const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
-app.use(cors())
+const { getStorage, ref, uploadBytes } = 'firebase/storage';
 app.use(express.json());
-
-//commented out so we can use the structure of this code later.
-// app.get("/api", (req, res) => {
-//     res.send({"test" : ["gruppe 40 <3", "gruppe 40 <3 <3", "gruppe 40 <3 <3 <3"]})
-// })
-// app.post('/api/teste', async (req, res) => {
-//     const { en, tre } = req.body
-//     const docRef = 
-//     setDoc(collection(db, "teste"), { en, tre });
-
-//     res.status(200).send(arr)
-// })
+const { v4: uuidv4 } = require('uuid');
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccount.json');
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: 'gs://flashy-3a502.appspot.com'
+});
 
 app.get("/api/getFlashcards", async (req, res) => {
     try {
         const data = await flashcards();
+        console.log("51" + data.json);
         res.send(data);
     } catch (error) {
         console.log(error)
@@ -47,8 +59,8 @@ app.get("/api/getFlashcards", async (req, res) => {
 app.get("/api/getFlashcard/:id", async (req, res) => {
     try {
         const flashcardId = req.params.id;
-        console.log(flashcardId)
         const data = await fetchFlashcardSet(flashcardId);
+        console.log("62" + data.json);
         res.send(data);
     } catch (error) {
         console.log(error);
@@ -112,7 +124,6 @@ app.post("/api/setFavourite", async (req, res) => {
     try {
         const { userID } = req.body
         const { flashcardSetID } = req.body
-        console.log('puch')
         await pushFavourite(userID, flashcardSetID)
     } catch (e) {
         res.status(500).send(dbFail)
@@ -124,7 +135,6 @@ app.post("/api/removeFavourite", async (req, res) => {
     try {
         const { userID } = req.body
         const { flashcardSetID } = req.body
-        console.log('punch')
         await removeFavourite(userID, flashcardSetID)
     } catch (e) {
         res.status(500).send(dbFail)
@@ -153,8 +163,6 @@ app.post('/api/setupUser', async (req, res) => {
 app.post('/api/editUser', async (req, res) => {
     const { data } = req.body;
     const dat = req.body;
-    console.log(data);
-    console.log(dat);
     // const user = req.body;
     // const { uid } = req.body
     // const userData = fetchData("user", uid)
@@ -165,24 +173,87 @@ app.post('/api/editUser', async (req, res) => {
     res.status(200).send(arr)
 })
 
-app.post('/api/uploadSet', async (req, res) => {
-    const { payload } = req.body;
-    await uploadFlashcardSet(payload.flashcardSetID, payload);
-    // Further logic related to saving the set
-    res.status(200).send(arr);
+// app.post('/api/uploadSet', async (req, res) => {
+//     const { payload } = req.body;
+//     await uploadFlashcardSet(payload.flashcardSetID, payload);
+//     // Further logic related to saving the set
+//     res.status(200).send(arr);
+// });
+
+app.post("/api/upload", mults.array("file"), async function (req, res, next) {
+
+    const { flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
+
+    const idToURLMapper = new Map();
+
+    try {
+        for (const fil of req.files) {
+            const blob = bucket.file(fil.originalname);
+            const blobStream = blob.createWriteStream();
+            const promise = new Promise((resolve, reject) => {
+                blobStream.on("error", (err) => {
+                    reject(err);
+                });
+                blobStream.on("finish", async () => {
+                    const expiration = Date.now() + 3155760000; //probably enough time
+
+                    try {
+                        const signedUrl = await blob.getSignedUrl({
+                            action: 'read',
+                            expires: expiration,
+                        });
+
+                        idToURLMapper.set(fil.originalname.split('_')[0], signedUrl);
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+                blobStream.end(fil.buffer);
+            });
+
+            // Wait for the promise to resolve before moving on to the next file
+            await promise.catch(error => {
+                console.error('Error generating signed URL:', error);
+                next(error);
+            });
+        }
+
+        let coverImage = 'https://storage.googleapis.com/flashy-3a502.appspot.com/3065d085-d0e6-4f74-8289-2e4e7d5ab1bf.png?GoogleAccessId=firebase-adminsdk-j0zai%40flashy-3a502.iam.gserviceaccount.com&Expires=1713652749&Signature=GppZUlDvIPQsPE%2Fa3jhUg2AsR5zUhSvWiduVm%2BwOZMirLgtpsA2bC7bfHLmrIB72ryvsNcx2RFuGrD3BsbAPGLkNcAb%2F4AKn3QvaX985RMFbsQkxBY%2Bs%2FI%2BPzic7Q2MnAXMtRsvbJBg5ooab%2FKf2BE9Tw4Z5KudQ9K%2BRW%2BgoUSSbeJEfPdG0%2Fu1k5j140NAK4EJsnN3GJzh4qnW1fcNw9jC0Qtjy6Xn8oAbO7Wzwro1tMm%2F2OiKvw9R%2BaD0ZdGb4l38oIFLFOp6eXvEIGbG6if8B8rvZHfE6ZgKUTeDFoFJdMW8qO9YWEyZsGs0LNVsMXR6zWDNYmPQqEfy9v371Ow%3D%3D';
+
+        idToURLMapper.forEach((value, key) => {
+            if (!key.startsWith("ANSWER") && !key.startsWith("QUESTION")) {
+                coverImage = value[0];
+                return;
+            }
+        });
+
+        const uploadData = {
+            creatorID: creatorID,
+            numberOfLikes: parseInt(numberOfLikes),
+            flashcardSetID: flashcardSetID,
+            setTitle: setTitle,
+            coverImage: coverImage,
+            description: description,
+            tags: tags != '' ? JSON.parse(tags).split(',') : [],
+            flashcards: JSON.parse(textRelatedToFlashcards).map(card => ({
+                flashcardID: card.flashcardID,
+                question: card.question,
+                answer: card.answer,
+                questionImage: idToURLMapper.has(`QUESTION-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`QUESTION-IMAGE${card.flashcardID}`)[0] : null,
+                answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : null,
+            }))
+        }
+
+        await uploadFlashcardSet(uploadData.flashcardSetID, uploadData);
+        res.status(200).send(arr);
+
+    } catch (error) {
+        console.error('Error processing files:', error);
+        res.status(500).send('Error processing files');
+    }
 });
 
-app.listen(5001, () => {console.log("server startet")})
-
-
-const main = async (id) => {
-    try {
-        const data = await fetchData('users', 'AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
-        console.log(data); 
-    } catch (e) {
-        console.log(e)
-    }
-  };
-
-  const data = main('AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
-
+app.listen(port, () => {
+  console.log(`listening at http://localhost:${port}`);
+});

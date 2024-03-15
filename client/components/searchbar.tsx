@@ -1,43 +1,51 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button } from "@nextui-org/react";
 import { serverEndpoint, flashcardSet } from "@/state/zustand";
+import { changeChosenSet } from "@/state/zustand";
 
-export default function SearchBar({ setData, setNum, setIsLoading }: any ) {
+export default function SearchBar({ setData, setNum, setIsLoading, data }: any ) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [first, setFirst] = useState(true);
+  const { sett, setSett } = changeChosenSet();
 
   const handleSearch = async () => {
-
-    // Retrieve all flashcards ass default
-    let endpoint = serverEndpoint + '/api/getFlashcards'
-
-    // If searching for something, retrive from search endpoint
-    if (searchTerm.trim().length != 0)
-      endpoint = serverEndpoint + '/api/getFlashcardsBySearch/' + searchTerm;
+    const endpoint = serverEndpoint + '/api/getFlashcards';
+    if (first) {
+      setFirst(false);
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
     
-    try {
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+    
+        const receivedData = await response.json();
+        setData(receivedData);
+        setSett(receivedData);
+        setNum(Math.ceil(receivedData.length / 3))
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
       }
-  
-      const data = await response.json();
-      setData(data);
-      setNum(Math.ceil(data.length / 3))
+    } else {
+      const filteredData: any[] = sett.filter((value: any) => value.setTitle.toLowerCase().startsWith(searchTerm.toLowerCase()));
+      setData(filteredData);
+      setNum(Math.ceil(filteredData.length / 3))
       setIsLoading(false);
-    } catch (error) {
-      console.error("Feil ved sending av data:", error);
     }
   };
 
   useEffect(() => {
     handleSearch();
   }, [searchTerm]);
+
+
+  
 
   return (
     <div className="flex items-center space-x-2">

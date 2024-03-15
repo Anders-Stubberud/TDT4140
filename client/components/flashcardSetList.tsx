@@ -35,24 +35,21 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
 
   const fetchData = async () => {
     try {
-      const userID = localStorage.getItem("userID");
-      console.log("test" + userID);
-      const response = await fetch(
-        `${serverEndpoint}/api/getFavourites/${userID}`
-      );
+      const userID = localStorage.getItem('userID');
+      const response = await fetch(`${serverEndpoint}/api/getFavourites/${userID}`);
       const data = await response.json();
       const favs: string[] = [];
-      for (let i = 0; i < Object.keys(data).length; i++) {
-        favs.push(data[i].flashcardSetID);
-      }
+      for (let i=0; i < Object.keys(data).length; i++) {
+        favs.push(data[i].flashcardSetID)
+      } 
       setFavourites(favs);
-      console.log(favs);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
+    console.log(flashcardSets);
     fetchData(); // Trigger on render
   }, []); // Empty dependency array means it runs once on mount
 
@@ -71,11 +68,9 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
                   <ThreeDCardDemo
                     id={flashcardSet.flashcardSetID}
                     creatorID={flashcardSet.creatorID}
-                    title={flashcardSet.name}
-                    imageUrl={`https://source.unsplash.com/random?dummy=${Math.floor(
-                      1000000 + Math.random() * 9000000
-                    )}`}
-                    description="description"
+                    title={flashcardSet.setTitle}
+                    imageUrl={flashcardSet.coverImage}
+                    description={flashcardSet.description}
                     buttonText="Play"
                     favourite={favourites.includes(flashcardSet.flashcardSetID)}
                   ></ThreeDCardDemo>
@@ -97,5 +92,6 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
     </div>
   );
 };
+
 
 export default FlashcardSetList;
