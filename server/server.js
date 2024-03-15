@@ -12,12 +12,13 @@ const dbFail = {
     "status": "Error in communication with db"
 }
 
+// Not in use?
 let user;
 
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser } = require('./firebase.js')
+const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 app.use(cors())
 app.use(express.json());
@@ -60,6 +61,26 @@ app.get("/api/getFavourites/:id", async (req, res) => {
         res.send(data).status(200)
     } catch (e) {
         res.status(500).send(dbFail)
+        console.log(e)
+    }
+})
+
+app.get("/api/getFlashcardsBySearch/:searchTerm", async (req, res) => {
+    try {
+        const searchTerm = req.params.searchTerm;
+        const data = await fetchFlashcardSetsBySearch(searchTerm);
+        res.send(data);
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+app.get("/api/getFlashcardsBySearch/:searchTerm", async (req, res) => {
+    try {
+        const searchTerm = req.params.searchTerm;
+        const data = await fetchFlashcardSetsBySearch(searchTerm);
+        res.send(data);
+    } catch (e) {
         console.log(e)
     }
 })
