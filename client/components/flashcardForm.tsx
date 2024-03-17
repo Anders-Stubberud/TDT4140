@@ -5,7 +5,7 @@ import {Divider} from "@nextui-org/react";
 import {Textarea} from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import { changeUserInfo } from "@/state/zustand";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TrashCanIcon } from "@/icons/trashcan";
 
 interface AreaProps {
@@ -47,21 +47,26 @@ export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChan
   }
   };
 
-  const [inputValue, setInputValue] = useState('');
+  const [inputValueQuestion, setInputValueQuestion] = useState('');
 
-  const handleChange = (event: any) => {
+  const handleChangeQuestion = (event: any) => {
     defaultAnswer = event.target.value;
     handleQuestionChange(id, (event.target.value));
-    setInputValue(event.target.value);
+    setInputValueQuestion(event.target.value);
   };
 
-  const [inputValue2, setInputValue2] = useState('');
+  const [inputValueAnswer, setInputValueAnswer] = useState('');
 
-  const handleChange2 = (event: any) => {
+  const handleChangeAnswer = (event: any) => {
     defaultQuestion = event.target.value;
     handleAnswerChange(id, (event.target.value));
-    setInputValue2(event.target.value);
+    setInputValueAnswer(event.target.value);
   };
+
+  useEffect(() => {
+    setInputValueQuestion(defaultQuestion);
+    setInputValueAnswer(defaultAnswer);
+  }, [])
 
   return (
         <div className="w-1/2 mt-8">
@@ -77,7 +82,7 @@ export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChan
         </div>
 
         <div className="flex flex-row items-center justify-center">
-            <Input label='Question' placeholder="Insert question" value={inputValue} onChange={handleChange} className="h-14 mr-4"></Input>
+            <Input label='Question' placeholder="Insert question" value={inputValueQuestion} onChange={handleChangeQuestion} className="h-14 mr-4"></Input>
             <Button isIconOnly color="warning" variant="faded" aria-label="Take a photo"
               onClick={ handleButtonClickQuestion }
             >
@@ -94,7 +99,7 @@ export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChan
         <Divider className="my-4" />
 
         <div className="flex flex-row items-center justify-center">
-            <Input label='Answer' placeholder="Insert answer" value={inputValue2} onChange={handleChange2} className="h-14 mr-4"></Input>
+            <Input label='Answer' placeholder="Insert answer" value={inputValueAnswer} onChange={handleChangeAnswer} className="h-14 mr-4"></Input>
             <Button isIconOnly color="warning" variant="faded" aria-label="Take a photo"
               onClick={handleButtonClickAnswer}
             >

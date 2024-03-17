@@ -48,20 +48,25 @@ export function SheetDemo() {
         <DropdownMenuContent className={`w-56 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => router.push('/profile')}>
-              <button className="text-m">
-                Profile
-              </button>
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => router.push('/profile')}>
+            <button className="text-m">
+              Profile
+            </button>
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          <DropdownMenuItem onClick={() => router.push('/profile')}>
+            <button className="text-m">
+              Administer users
+            </button>
+            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+          </DropdownMenuItem>
           <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
           <DropdownMenuItem> 
             <button onClick={() => logOut()}>
               Log out
             </button>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            <DropdownMenuShortcut>⇧⌘R</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

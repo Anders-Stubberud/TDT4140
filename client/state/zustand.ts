@@ -34,6 +34,8 @@ interface userLoggedIn {
     userID: string | undefined;
     username: string | null
     profileImageURL: string | null
+    isAdmin: boolean
+    setIsAdmin: (newAdminStatus: boolean) => void
     setProfileImageURLZustand: (profileImageURL: string | null) => void
     setUserNameZustand: (username: string) => void
     setUserIDZustand: (userID: string | undefined) => void
@@ -43,6 +45,8 @@ export const useUserStore = create<userLoggedIn>()((set) => ({
     userID: "",
     username: null,
     profileImageURL: null,
+    isAdmin: false,
+    setIsAdmin: (newAdminStatus: boolean) => set({ isAdmin: newAdminStatus }),
     setProfileImageURLZustand: (newProfileImageURL: string | null) => set({ profileImageURL: newProfileImageURL }),
     setUserNameZustand: (newUserName: string | null) => set({ username: newUserName }),
     setUserIDZustand: (newUserID: string | undefined) => set({ userID: newUserID })
@@ -153,4 +157,14 @@ export interface createCards {
 export const changeCardsForm = create<createCards>()((set) => ({
     cardFormArr: [],
     setCardFormArr: (cardFormArr: any []) => set({cardFormArr})
+}))
+
+export interface cardEdit {
+    idOfSetToEdit: string | null
+    setIdOfSetToEdit: (wannaEdit: string | null) => void
+}
+
+export const editTheSet = create<cardEdit>()((set) => ({
+    idOfSetToEdit: null,
+    setIdOfSetToEdit: (wannaEdit: string | null) => set({idOfSetToEdit: wannaEdit})
 }))

@@ -13,7 +13,7 @@ import "firebaseui/dist/firebaseui.css";
 export default function WelcomePage() {
 
 	const { setIsLoggedIn } = zustand();
-	const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand } = useUserStore();
+	const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, setIsAdmin } = useUserStore();
 	const auth = getAuth();
 	const [user] = useAuthState(auth);
 	const apiURL = "http://localhost:5001/api";
@@ -70,6 +70,9 @@ export default function WelcomePage() {
 				localStorage.setItem('userID', user.uid);
 				const res = await fetch(apiURL + `/getUserInformation/${user?.uid}`);
 				const data = await res.json();
+				setIsAdmin(data.admin);
+				localStorage.setItem('admin', data.admin);
+				localStorage.setItem('profilePictureURL', data.profilePictureURL);
 				setProfileImageURLZustand(data.profilePictureURL);
 				setUserNameZustand(data.userName);
 				setIsLoggedIn(true);

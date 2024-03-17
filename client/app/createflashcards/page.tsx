@@ -9,7 +9,7 @@ import { Textarea } from "@nextui-org/input";
 import { Divider } from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { changeUserInfo, serverEndpoint } from "@/state/zustand";
+import { changeUserInfo, editTheSet, serverEndpoint } from "@/state/zustand";
 import { useRef } from "react";
 import { CameraIcon } from "../../icons/cameraIcon";
 import { AvatarDemo } from "@/components/avatar";
@@ -26,24 +26,17 @@ import { flashcard, flashcardSet } from "@/state/zustand";
 import { title } from "process";
 import axios from "axios";
 
-export default function CreateflashcardsPage() {
+export default function CreateflashcardsPage(navigationData: any) {
 
   const [coverImage, setCoverImage] = useState<any>();
   const fileInputRef = useRef(null);
   const router = useRouter();
-
+  const { idOfSetToEdit, setIdOfSetToEdit } = editTheSet();
   const [numberOfLikes, setNumberOfLikes] = useState<number>(0);
 
   const handleButtonClick = () => {
     (fileInputRef.current as HTMLInputElement | null)?.click();
   };
-
-  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const selectedFile = event.target.files?.[0];
-	// if (selectedFile != undefined) {
-	// 	setCoverImage(selectedFile);
-	// }
-  // };
 
   const handleFileChange = (e: any) => {
     const img = {
@@ -58,34 +51,73 @@ export default function CreateflashcardsPage() {
   const [cardInformation, setCardInformation] = useState<any []>([]);
 
   useEffect(() => {
-    // Fetch questions and answers here
-    const fetchedQuestions = [""];
-    const fetchedAnswers = [""];
-    const uuidID = uuidv4();
-    setCardInformation([... cardInformation,         {
-      cardID: uuidID,
-      cardQuestion: "",
-      cardAnswer: "",
-      questionImage: null,
-      answerImage: null
-    }])
+    const fetchData = async () => {
+      if (idOfSetToEdit) {
+        try {
+          const response = await fetch(`${serverEndpoint}/api/getFlashcard/${idOfSetToEdit}`);
+          const data = await response.json();
+          const flashcards = data.flashcards
+          const title = data.setTitle;
+          const description = data.description;
+          const tags = data.tags;
+          console.log(tags);
+          setSetTitle(title);
+          setSelectedItems(tags);
+          setDescription(description);
 
-    const newCardFormArr = fetchedQuestions.map((question, index) => (
-      <FlashcardForm 
-        handleAnswerImageChange={ handleAnswerImageChange }
-        handleQuestionImageChange={ handleQuestionImageChange }
-        handleAnswerChange={handleAnswerChange}
-        handleQuestionChange={handleQuestionChange}
-        id={ uuidID }
-        defaultAnswer={fetchedAnswers[index]} 
-        defaultQuestion={question} 
-        remove={removeCard} 
-        numberInLine={index + 1} 
-      />
-    ));
-
-    setCardFormArr(newCardFormArr);
-  }, [])
+          const newCardFormArr = flashcards.map((value: any, index: number) => (
+            <FlashcardForm 
+              handleAnswerImageChange={handleAnswerImageChange}
+              handleQuestionImageChange={handleQuestionImageChange}
+              handleAnswerChange={handleAnswerChange}
+              handleQuestionChange={handleQuestionChange}
+              id={value.flashcardID}
+              defaultAnswer={value.answer} 
+              defaultQuestion={value.question} 
+              remove={removeCard} 
+              numberInLine={index + 1} 
+            />
+          ));
+          setCardFormArr(newCardFormArr);
+          setIdOfSetToEdit(null);
+        } catch (error) {
+          console.error('Error fetching flashcard:', error);
+        }
+      } else {
+        const fetchedQuestions = [""];
+        const fetchedAnswers = [""];
+        const uuidID = uuidv4();
+        setCardInformation(prevCardInformation => [
+          ...prevCardInformation,
+          {
+            cardID: uuidID,
+            cardQuestion: "",
+            cardAnswer: "",
+            questionImage: null,
+            answerImage: null
+          }
+        ]);
+    
+        const newCardFormArr = fetchedQuestions.map((question, index) => (
+          <FlashcardForm 
+            handleAnswerImageChange={handleAnswerImageChange}
+            handleQuestionImageChange={handleQuestionImageChange}
+            handleAnswerChange={handleAnswerChange}
+            handleQuestionChange={handleQuestionChange}
+            id={uuidID}
+            defaultAnswer={fetchedAnswers[index]} 
+            defaultQuestion={question} 
+            remove={removeCard} 
+            numberInLine={index + 1} 
+          />
+        ));
+        setCardFormArr(newCardFormArr);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
 
   const handleQuestionChange = (id: string, question: string) => {
     setCardInformation(cardInformation.map((card) =>
@@ -211,7 +243,7 @@ export default function CreateflashcardsPage() {
     }
   };
   
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState<string []>([]);
 
   const handleSelectionChange = (event: any) => {
     const selectedItems = event.target.value;
@@ -222,7 +254,7 @@ export default function CreateflashcardsPage() {
 
   const [description, setDescription] = useState('');
 
-  const handleChange = (event: any) => {
+  const handleChangeTitle = (event: any) => {
     setSetTitle(event.target.value);
   };
 
@@ -239,7 +271,7 @@ export default function CreateflashcardsPage() {
             </h2>
             <MultiStepLoaderDemo clicked={sendCardsToDatabase}></MultiStepLoaderDemo>
         </div>
-        <Input label='Title' placeholder="The title of your set" value={setTitle} onChange={handleChange} className="h-14 my-4"></Input>
+        <Input label='Title' placeholder="The title of your set" value={setTitle} onChange={handleChangeTitle} className="h-14 my-4"></Input>
         <Divider className="my-4" />
         <div className="flex flex-row">
             <Textarea
@@ -268,13 +300,14 @@ export default function CreateflashcardsPage() {
             />
             <div className="w-56">
             <Select
-      label="Tags"
-      placeholder="Select tag"
-      selectionMode="multiple"
-      className="max-w-xs"
-      onChange={handleSelectionChange} // Assign the event handler
-      value={selectedItems} // Controlled component: set the selected items
-    >
+              label="Tags"
+              placeholder="Select tag"
+              selectionMode="multiple"
+              className="max-w-xs"
+              onChange={handleSelectionChange}
+              value={selectedItems}
+              selectedKeys={selectedItems}
+            >
       {[
         { value: 'math', label: 'Mathematics' },
         { value: 'science', label: 'Natural Sciences' },

@@ -4,10 +4,11 @@ import {Image} from "@nextui-org/react";
 import NextImage from "next/image";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
-import { toggleSet, useUserStore, zustand } from "@/state/zustand";
+import { editTheSet, toggleSet, useUserStore, zustand } from "@/state/zustand";
 import NextLink from "next/link";
 import FavouriteButton from "./favourite-button";
 import { TrashCanIcon } from "@/icons/trashcan";
+import EditIcon from "@/icons/editIcon";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Button } from "@nextui-org/button";
@@ -26,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 interface ThreeDCardProps {
   title: string;
@@ -48,10 +50,17 @@ export function ThreeDCardDemo({
 }: ThreeDCardProps) {
   const { setname, setSet } = toggleSet();
   const { setIsLoggedIn } = zustand();
-  const { setUserID } = useUserStore();
   const auth = getAuth();
   const [user] = useAuthState(auth);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { isAdmin, setIsAdmin, setProfileImageURLZustand } = useUserStore();
+  const router = useRouter();
+  const { setIdOfSetToEdit } = editTheSet();
+
+  useEffect(() => {
+    setIsAdmin(localStorage.getItem('admin') === 'true');
+    setProfileImageURLZustand(localStorage.getItem('profilePictureURL'));
+  }, [])
 
   const handleDelete = async () => {
     try {
@@ -70,6 +79,11 @@ export function ThreeDCardDemo({
     window.location.reload();
   };
 
+  const handleEditSet = () => {
+    setIdOfSetToEdit(id);
+    router.push('createflashcards');
+  }
+
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[20rem] h-auto rounded-xl p-6 border  ">
@@ -78,8 +92,11 @@ export function ThreeDCardDemo({
           isFavorite={favourite}
           userID={user?.uid}
         ></FavouriteButton>
-        {user?.uid == creatorID /*|| user?.isAdmin*/ ? (
-          <div className="absolute top-5 right-5">
+        {user?.uid == creatorID || isAdmin ? (
+          <div className="absolute top-5 right-5 flex flex-row">
+            <button className="mr-4" onClick={() => handleEditSet()}>
+            <EditIcon></EditIcon>
+            </button>
             <AlertDialog>
               <AlertDialogTrigger>
                 <TrashCanIcon></TrashCanIcon>
