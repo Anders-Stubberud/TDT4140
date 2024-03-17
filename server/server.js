@@ -59,7 +59,6 @@ app.get("/api/getUserInformation/:userID", async (req, res) => {
 app.get("/api/getFlashcards", async (req, res) => {
     try {
         const data = await flashcards();
-        console.log("61" + data.json);
         res.send(data);
     } catch (error) {
         console.log(error)
@@ -205,9 +204,8 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
 
     const { cardIDToURLMapper, flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
 
+    const newCardToURLMapper = JSON.parse(cardIDToURLMapper);
     const idToURLMapper = new Map();
-
-    console.log(cardIDToURLMapper);
 
     try {
         for (const fil of req.files) {
@@ -242,32 +240,35 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
             });
         }
 
-        let coverImage = 'https://storage.googleapis.com/flashy-3a502.appspot.com/3065d085-d0e6-4f74-8289-2e4e7d5ab1bf.png?GoogleAccessId=firebase-adminsdk-j0zai%40flashy-3a502.iam.gserviceaccount.com&Expires=1713652749&Signature=GppZUlDvIPQsPE%2Fa3jhUg2AsR5zUhSvWiduVm%2BwOZMirLgtpsA2bC7bfHLmrIB72ryvsNcx2RFuGrD3BsbAPGLkNcAb%2F4AKn3QvaX985RMFbsQkxBY%2Bs%2FI%2BPzic7Q2MnAXMtRsvbJBg5ooab%2FKf2BE9Tw4Z5KudQ9K%2BRW%2BgoUSSbeJEfPdG0%2Fu1k5j140NAK4EJsnN3GJzh4qnW1fcNw9jC0Qtjy6Xn8oAbO7Wzwro1tMm%2F2OiKvw9R%2BaD0ZdGb4l38oIFLFOp6eXvEIGbG6if8B8rvZHfE6ZgKUTeDFoFJdMW8qO9YWEyZsGs0LNVsMXR6zWDNYmPQqEfy9v371Ow%3D%3D';
-
+        const coverImageDefault = 'https://storage.googleapis.com/flashy-3a502.appspot.com/3065d085-d0e6-4f74-8289-2e4e7d5ab1bf.png?GoogleAccessId=firebase-adminsdk-j0zai%40flashy-3a502.iam.gserviceaccount.com&Expires=1713652749&Signature=GppZUlDvIPQsPE%2Fa3jhUg2AsR5zUhSvWiduVm%2BwOZMirLgtpsA2bC7bfHLmrIB72ryvsNcx2RFuGrD3BsbAPGLkNcAb%2F4AKn3QvaX985RMFbsQkxBY%2Bs%2FI%2BPzic7Q2MnAXMtRsvbJBg5ooab%2FKf2BE9Tw4Z5KudQ9K%2BRW%2BgoUSSbeJEfPdG0%2Fu1k5j140NAK4EJsnN3GJzh4qnW1fcNw9jC0Qtjy6Xn8oAbO7Wzwro1tMm%2F2OiKvw9R%2BaD0ZdGb4l38oIFLFOp6eXvEIGbG6if8B8rvZHfE6ZgKUTeDFoFJdMW8qO9YWEyZsGs0LNVsMXR6zWDNYmPQqEfy9v371Ow%3D%3D';
+        let cvrImg = null;
         idToURLMapper.forEach((value, key) => {
             if (!key.startsWith("ANSWER") && !key.startsWith("QUESTION")) {
-                coverImage = value[0];
+                cvrImg = value[0];
                 return;
             }
         });
-        console.log(tags);
+        console.log(newCardToURLMapper);
+        console.log(JSON.parse(textRelatedToFlashcards));
+        console.log(typeof newCardToURLMapper);
+        console.log(newCardToURLMapper.hasOwnProperty(`answer-38e9cdbd-03ec-4568-a444-a1608a0c7eaa`));
         const uploadData = {
             creatorID: creatorID,
             numberOfLikes: parseInt(numberOfLikes),
             flashcardSetID: flashcardSetID,
             setTitle: setTitle,
-            coverImage: idToURLMapper.has(flashcardSetID) ? idToURLMapper.get(card.flashcardID) : coverImage,
+            coverImage: cvrImg ? cvrImg : newCardToURLMapper.hasOwnProperty(flashcardSetID) ? newCardToURLMapper[flashcardSetID] : coverImageDefault,
             description: description,
             tags: tags != '' ? JSON.parse(tags) : [],
             flashcards: JSON.parse(textRelatedToFlashcards).map(card => ({
                 flashcardID: card.flashcardID,
                 question: card.question,
                 answer: card.answer,
-                questionImage: idToURLMapper.has(`QUESTION-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`QUESTION-IMAGE${card.flashcardID}`)[0] : idToURLMapper.has(card.flashcardID) ? idToURLMapper.get(card.flashcardID) : null,
-                answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : idToURLMapper.has(card.flashcardID) ? idToURLMapper.get(card.flashcardID) : null,
+                questionImage: idToURLMapper.has(`QUESTION-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`QUESTION-IMAGE${card.flashcardID}`)[0] : newCardToURLMapper.hasOwnProperty(`question-${card.flashcardID}`) ? newCardToURLMapper[`question-${card.flashcardID}`] : null,
+                answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : newCardToURLMapper.hasOwnProperty(`answer-${card.flashcardID}`) ? newCardToURLMapper[`answer-${card.flashcardID}`] : null,
             }))
         }
-
+        console.log(uploadData);
         await uploadFlashcardSet(uploadData.flashcardSetID, uploadData);
         res.status(200).send(arr);
 

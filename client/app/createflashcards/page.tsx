@@ -66,8 +66,8 @@ export default function CreateflashcardsPage(navigationData: any) {
           const title = data.setTitle;
           const description = data.description;
           const tags = data.tags;
-          const coverImageURL = data.coverImageURL;
-          setCoverImageURL(coverImageURL);
+          const cveImageURL = data.coverImage;
+          addKeyValuePair(idOfSetToEdit, cveImageURL);
           setSetTitle(title);
           setSelectedItems(tags);
           setDescription(description);
@@ -85,18 +85,21 @@ export default function CreateflashcardsPage(navigationData: any) {
             />
           ));
 
-          flashcards.forEach((flashcardItem: any) => {
-            const newCardInfo = {
-              cardID: flashcardItem.flashcardID,
-              cardQuestion: flashcardItem.question,
-              cardAnswer: flashcardItem.answer,
-              questionImage: flashcardItem.questionImage,
-              answerImage: flashcardItem.answerImage
-            };
+          const newCardInformation = flashcards.map((flashcardItem: any) => ({
+            cardID: flashcardItem.flashcardID,
+            cardQuestion: flashcardItem.question,
+            cardAnswer: flashcardItem.answer,
+            questionImage: flashcardItem.questionImage,
+            answerImage: flashcardItem.answerImage
+          }));
           
-            setCardInformation(prevCardInformation => [...prevCardInformation, newCardInfo]);
+          newCardInformation.forEach((cardInfo: any) => {
+            addKeyValuePair(`question-${cardInfo.cardID}`, cardInfo.questionImage);
+            addKeyValuePair(`answer-${cardInfo.cardID}`, cardInfo.answerImage);
           });
-  
+          
+
+          setCardInformation(prevCardInformation => [...prevCardInformation, ...newCardInformation]);
           setCardFormArr(newCardFormArr);
           setLocalSetID(idOfSetToEdit);
           setIdOfSetToEdit(null);
@@ -203,17 +206,14 @@ export default function CreateflashcardsPage(navigationData: any) {
           answerImage: cardInformation.find((info) => info.cardID === card.props.id).answerImage,
           questionImage: cardInformation.find((info) => info.cardID === card.props.id).questionImage
       }))
-
+      
       let formData = new FormData();
 
-      if (coverImage) {
+      if (coverImage && typeof coverImage !== 'string') {
         const fileType: string = coverImage.data.type.split('/')[1]
         const fileExtension = mimeToExt[fileType];
         const newCoverImage:any = new File([coverImage.data], `${flashcardSetID}.${fileExtension}`, { type: coverImage.type });
         formData.append("file", newCoverImage);
-      }
-      if (coverImageURL) {
-        addKeyValuePair(localSetID, coverImageURL);
       }
       if ( localSetID) {
         formData.append('flashcardSetID', localSetID);
@@ -247,24 +247,16 @@ export default function CreateflashcardsPage(navigationData: any) {
           const newAnswerImage:any = new File([isAnswerImage], `${'ANSWER-IMAGE'}${flashycardy.flashcardID}_.${fileExtension}`, { type: isAnswerImage.type });
           formData.append('file', newAnswerImage);
         }
-        else if (isAnswerImage && typeof flashycardy.answerImage == 'string') {
-          console.log('b');
-          addKeyValuePair(flashycardy.flashcardID, flashycardy.answerImage);
-        }
 
-        if (isQuestionImage) {
+        if (isQuestionImage && typeof flashycardy.questionImage !== 'string') {
           console.log('c');
           const fileType: string = isQuestionImage.type.split('/')[1]
           const fileExtension = mimeToExt[fileType];
           const newQuestionImage:any = new File([isQuestionImage], `${'QUESTION-IMAGE'}${flashycardy.flashcardID}_.${fileExtension}`, { type: isQuestionImage.type });
           formData.append('file', newQuestionImage);
         }
-        else if (isQuestionImage && typeof flashycardy.questionImage == 'string') {
-          console.log('d');
-          addKeyValuePair(flashycardy.flashcardID, flashycardy.questionImage);
-        }
       })
-
+      console.log(cardIDToURLMapper);
       formData.append('cardIDToURLMapper', JSON.stringify(cardIDToURLMapper));
       formData.append('textRelatedToFlashcards', JSON.stringify(textRelatedToFlashcards));
 
