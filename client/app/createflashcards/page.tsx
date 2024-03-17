@@ -29,10 +29,16 @@ import axios from "axios";
 export default function CreateflashcardsPage(navigationData: any) {
 
   const [coverImage, setCoverImage] = useState<any>();
+  const [coverImageURL, setCoverImageURL] = useState<string | null>(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
   const { idOfSetToEdit, setIdOfSetToEdit } = editTheSet();
   const [numberOfLikes, setNumberOfLikes] = useState<number>(0);
+  const [localSetID, setLocalSetID] = useState<string | null>(null);
+  const [cardIDToURLMapper, setItems] = useState({});
+  const addKeyValuePair = (key: any, value: any) => {
+    setItems(prevItems => ({ ...prevItems, [key]: value }));
+  };
 
   const handleButtonClick = () => {
     (fileInputRef.current as HTMLInputElement | null)?.click();
@@ -60,11 +66,11 @@ export default function CreateflashcardsPage(navigationData: any) {
           const title = data.setTitle;
           const description = data.description;
           const tags = data.tags;
-          console.log(tags);
+          const coverImageURL = data.coverImageURL;
+          setCoverImageURL(coverImageURL);
           setSetTitle(title);
           setSelectedItems(tags);
           setDescription(description);
-
           const newCardFormArr = flashcards.map((value: any, index: number) => (
             <FlashcardForm 
               handleAnswerImageChange={handleAnswerImageChange}
@@ -78,7 +84,21 @@ export default function CreateflashcardsPage(navigationData: any) {
               numberInLine={index + 1} 
             />
           ));
+
+          flashcards.forEach((flashcardItem: any) => {
+            const newCardInfo = {
+              cardID: flashcardItem.flashcardID,
+              cardQuestion: flashcardItem.question,
+              cardAnswer: flashcardItem.answer,
+              questionImage: flashcardItem.questionImage,
+              answerImage: flashcardItem.answerImage
+            };
+          
+            setCardInformation(prevCardInformation => [...prevCardInformation, newCardInfo]);
+          });
+  
           setCardFormArr(newCardFormArr);
+          setLocalSetID(idOfSetToEdit);
           setIdOfSetToEdit(null);
         } catch (error) {
           console.error('Error fetching flashcard:', error);
@@ -192,8 +212,15 @@ export default function CreateflashcardsPage(navigationData: any) {
         const newCoverImage:any = new File([coverImage.data], `${flashcardSetID}.${fileExtension}`, { type: coverImage.type });
         formData.append("file", newCoverImage);
       }
-
-      formData.append('flashcardSetID', flashcardSetID);
+      if (coverImageURL) {
+        addKeyValuePair(localSetID, coverImageURL);
+      }
+      if ( localSetID) {
+        formData.append('flashcardSetID', localSetID);
+      }
+      else {
+        formData.append('flashcardSetID', flashcardSetID);
+      }
       if (userID) {
         formData.append('creatorID', userID);
       }
@@ -202,7 +229,6 @@ export default function CreateflashcardsPage(navigationData: any) {
       formData.append('description', description);
       formData.append('tags', selectedItems.length != 0 ? JSON.stringify(selectedItems) : "");
       flashcards.forEach((flashycardy) => {
-
         const associatedInformation = {
           flashcardID: flashycardy.flashcardID,
           answer: flashycardy.answer,
@@ -214,23 +240,32 @@ export default function CreateflashcardsPage(navigationData: any) {
         const isAnswerImage = flashycardy.answerImage;
         const isQuestionImage = flashycardy.questionImage;
 
-        if (isAnswerImage) {
-          console.log(isAnswerImage);
+        if (isAnswerImage && typeof flashycardy.answerImage !== 'string') {
+          console.log('a');
           const fileType: string = isAnswerImage.type.split('/')[1]
           const fileExtension = mimeToExt[fileType];
           const newAnswerImage:any = new File([isAnswerImage], `${'ANSWER-IMAGE'}${flashycardy.flashcardID}_.${fileExtension}`, { type: isAnswerImage.type });
           formData.append('file', newAnswerImage);
         }
+        else if (isAnswerImage && typeof flashycardy.answerImage == 'string') {
+          console.log('b');
+          addKeyValuePair(flashycardy.flashcardID, flashycardy.answerImage);
+        }
 
         if (isQuestionImage) {
-          console.log(isQuestionImage.type);
+          console.log('c');
           const fileType: string = isQuestionImage.type.split('/')[1]
           const fileExtension = mimeToExt[fileType];
           const newQuestionImage:any = new File([isQuestionImage], `${'QUESTION-IMAGE'}${flashycardy.flashcardID}_.${fileExtension}`, { type: isQuestionImage.type });
           formData.append('file', newQuestionImage);
         }
+        else if (isQuestionImage && typeof flashycardy.questionImage == 'string') {
+          console.log('d');
+          addKeyValuePair(flashycardy.flashcardID, flashycardy.questionImage);
+        }
       })
 
+      formData.append('cardIDToURLMapper', JSON.stringify(cardIDToURLMapper));
       formData.append('textRelatedToFlashcards', JSON.stringify(textRelatedToFlashcards));
 
       const response = await fetch("http://localhost:5001/api/upload", {
@@ -247,7 +282,8 @@ export default function CreateflashcardsPage(navigationData: any) {
 
   const handleSelectionChange = (event: any) => {
     const selectedItems = event.target.value;
-    setSelectedItems(selectedItems);
+    const arr = selectedItems.split(",");
+    setSelectedItems(arr);
   };  
 
   const [setTitle, setSetTitle] = useState('');
@@ -304,9 +340,8 @@ export default function CreateflashcardsPage(navigationData: any) {
               placeholder="Select tag"
               selectionMode="multiple"
               className="max-w-xs"
-              onChange={handleSelectionChange}
-              value={selectedItems}
               selectedKeys={selectedItems}
+              onChange={handleSelectionChange}
             >
       {[
         { value: 'math', label: 'Mathematics' },

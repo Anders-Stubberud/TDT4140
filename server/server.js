@@ -203,9 +203,11 @@ app.post('/api/editUser', async (req, res) => {
 
 app.post("/api/upload", mults.array("file"), async function (req, res, next) {
 
-    const { flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
+    const { cardIDToURLMapper, flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
 
     const idToURLMapper = new Map();
+
+    console.log(cardIDToURLMapper);
 
     try {
         for (const fil of req.files) {
@@ -248,21 +250,21 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
                 return;
             }
         });
-
+        console.log(tags);
         const uploadData = {
             creatorID: creatorID,
             numberOfLikes: parseInt(numberOfLikes),
             flashcardSetID: flashcardSetID,
             setTitle: setTitle,
-            coverImage: coverImage,
+            coverImage: idToURLMapper.has(flashcardSetID) ? idToURLMapper.get(card.flashcardID) : coverImage,
             description: description,
-            tags: tags != '' ? JSON.parse(tags).split(',') : [],
+            tags: tags != '' ? JSON.parse(tags) : [],
             flashcards: JSON.parse(textRelatedToFlashcards).map(card => ({
                 flashcardID: card.flashcardID,
                 question: card.question,
                 answer: card.answer,
-                questionImage: idToURLMapper.has(`QUESTION-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`QUESTION-IMAGE${card.flashcardID}`)[0] : null,
-                answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : null,
+                questionImage: idToURLMapper.has(`QUESTION-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`QUESTION-IMAGE${card.flashcardID}`)[0] : idToURLMapper.has(card.flashcardID) ? idToURLMapper.get(card.flashcardID) : null,
+                answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : idToURLMapper.has(card.flashcardID) ? idToURLMapper.get(card.flashcardID) : null,
             }))
         }
 
