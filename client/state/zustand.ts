@@ -11,15 +11,15 @@ export const zustand = create<userState>()((set) => ({
     setIsLoggedIn: (isLoggedIn: boolean) => set({isLoggedIn})
 }))
 
-interface darkMode {
-    dark: string
-    setDark: (dark: string) => void
-}
+// interface darkMode {
+//     dark: string
+//     setDark: (dark: string) => void
+// }
 
-export const toggleDarkMode = create<darkMode>()((set) => ({
-    dark: "bg-white",
-    setDark: (dark: string) => set({dark})
-}))
+// export const toggleDarkMode = create<darkMode>()((set) => ({
+//     dark: "bg-white",
+//     setDark: (dark: string) => set({dark})
+// }))
 
 interface favourite_sets {
     favourites: string [];

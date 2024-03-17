@@ -24,6 +24,7 @@ import { Bot } from "lucide-react";
 import { NavigationMenuDemo } from "./navigationmenu";
 import { zustand } from "../state/zustand";
 import { getAuth } from "firebase/auth";
+import { useTheme } from "next-themes";
 
 export function SheetDemo() {
 
@@ -32,37 +33,37 @@ export function SheetDemo() {
     const {setIsLoggedIn} = zustand();
     const auth = getAuth();
     const [user] = useAuthState(auth);
+    const { theme, setTheme } = useTheme();
 
     const logOut = () => {
         signOut(auth)
         localStorage.removeItem('userID')
     }
 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost"><AvatarDemo></AvatarDemo></Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => router.push('/profile')}>
-            <button className="m-2">Settings</button>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <button className="m-2">My sets</button>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <button className="m-2">My favourite sets</button>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="flex justify-center mt-10">
-            <Button onClick={() => logOut()} type="submit" className="mt-28 bg-red-700">
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost"><AvatarDemo></AvatarDemo></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className={`w-56 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => router.push('/profile')}>
+              <button className="text-m">
+                Profile
+              </button>
+              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          <DropdownMenuItem> 
+            <button onClick={() => logOut()}>
               Log out
-            </Button>
+            </button>
+            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
 }

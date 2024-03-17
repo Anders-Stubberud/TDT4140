@@ -34,7 +34,7 @@ const cloudStorage = new Storage({
 });
 const bucketName = "gs://flashy-3a502.appspot.com";
 const bucket = cloudStorage.bucket(bucketName);
-const {db, uploadData, fetchData, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
+const {db, uploadData, fetchData, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 const { getStorage, ref, uploadBytes } = 'firebase/storage';
 app.use(express.json());
@@ -246,6 +246,56 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
         }
 
         await uploadFlashcardSet(uploadData.flashcardSetID, uploadData);
+        res.status(200).send(arr);
+
+    } catch (error) {
+        console.error('Error processing files:', error);
+        res.status(500).send('Error processing files');
+    }
+});
+
+app.post("/api/editUserProfile", mults.single("file"), async function (req, res, next) {
+
+    const { userID, username } = req.body;
+
+    var profileImageURL = null
+
+    try {
+        if (req.file) {
+            const file = req.file;
+            const blob = bucket.file(file.originalname);
+            const blobStream = blob.createWriteStream();
+            const promise = new Promise((resolve, reject) => {
+                blobStream.on("error", (err) => {
+                    reject(err);
+                });
+                blobStream.on("finish", async () => {
+                    const expiration = Date.now() + 3155760000; //probably enough time
+                    try {
+                        const signedUrl = await blob.getSignedUrl({
+                            action: 'read',
+                            expires: expiration,
+                        });
+                        profileImageURL = signedUrl;
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+                blobStream.end(file.buffer);
+            });
+            await promise.catch(error => {
+                console.error('Error generating signed URL:', error);
+                next(error);
+            });
+        }
+
+        const uploadData = {
+            username: username,
+            profilePictureURL: profileImageURL
+        }
+
+        await editUserInformation(userID, uploadData);
         res.status(200).send(arr);
 
     } catch (error) {

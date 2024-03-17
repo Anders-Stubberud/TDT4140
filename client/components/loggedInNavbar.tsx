@@ -38,6 +38,7 @@ import { NavigationMenuDemo } from "./navigationmenu";
 import { AvatarDemo } from "./avatar";
 import { Button } from "./ui/button";
 import { useUserStore } from "../state/zustand";
+import { useTheme } from "next-themes";
 
 export const LoggedInNavbar = () => {
 
@@ -46,6 +47,7 @@ export const LoggedInNavbar = () => {
   const auth = getAuth();
   const [user] = useAuthState(auth);
   const { setUserID } = useUserStore();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
       setUserID(user?.uid);
@@ -73,7 +75,7 @@ export const LoggedInNavbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" className="z-50">
+    <NextUINavbar maxWidth="xl" position="sticky" className={`z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">

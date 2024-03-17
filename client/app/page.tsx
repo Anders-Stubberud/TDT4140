@@ -13,27 +13,27 @@ import { CustomCarousel } from "@/components/custom-carousel";
 import { useTheme } from "next-themes";
 import useWindowSize from 'react-use/lib/useWindowSize'
 import { useRouter } from 'next/navigation'
-import { toggleDarkMode } from "../state/zustand";
+// import { toggleDarkMode } from "../state/zustand";
 import Confetti from 'react-confetti'
 
 export default function Home() {
 
-	const { setDark } = toggleDarkMode();
+	// const { setDark } = toggleDarkMode();
   	const router = useRouter();
 	const [login, toggleLogin] = useState(false);
-	const [darkmode, setDarkmode] = useState<boolean>(true)
-	const { theme, setTheme } = useTheme();
-	const { width, height } = useWindowSize()
+	// const [darkmode, setDarkmode] = useState<boolean>(true)
+	// const { theme, setTheme } = useTheme();
+	// const { width, height } = useWindowSize()
 
-	useEffect(() => {
-		setDarkmode(theme === "dark");
-		setDark(theme === "dark" ? "bg-black" : "bg-white")
-	}, [theme])
+	// useEffect(() => {
+	// 	setDarkmode(theme === "dark");
+	// 	setDark(theme === "dark" ? "bg-black" : "bg-white")
+	// }, [theme])
 
-	const customstyle = {
-		backgroundColor: darkmode ? "white" : "black",
-		color: darkmode ? "black" : "white"
-	}
+	// const customstyle = {
+	// 	backgroundColor: darkmode ? "white" : "black",
+	// 	color: darkmode ? "black" : "white"
+	// }
 
 	return (
 		<section className="flex flex-col items-center justify-center gap-4 py-8 md:py-7.5">
@@ -46,7 +46,7 @@ export default function Home() {
 				</h1>
 				<div>
 					<CustomCarousel></CustomCarousel>
-					<Button style={customstyle} size="lg" className="mt-10" onClick={() => router.push('/login')}>
+					<Button size="lg" className="mt-10" onClick={() => router.push('/login')}>
             Sign me up!
 					</Button>
           <h4 className="font-bold text-large mt-3">Already a member? <span className="ml-1 text-blue-600 underline cursor-pointer" onClick={() => router.push('/login')}>Log in</span> </h4>

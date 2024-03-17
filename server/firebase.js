@@ -38,6 +38,12 @@ const uploadUser = async (userID, data) => {
     await setDoc(doc(db, userCollection, userID), data, { merge: true});
 }
 
+const editUserInformation = async (userID, data) => {
+    await updateDoc(doc(db, userCollection, userID), {
+        data
+    })
+}
+
 const fetchUser = async (userID) => {
     
     const docSnap = await (getDoc(doc(db, userCollection, userID)))
@@ -202,5 +208,6 @@ module.exports = {
     pushFavourite,
     removeFavourite,
     fetchFavourites,
-    fetchUser
+    fetchUser,
+    editUserInformation
 };

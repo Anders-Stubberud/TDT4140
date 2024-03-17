@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { toggleDarkMode } from "../state/zustand";
+// import { toggleDarkMode } from "../state/zustand";
 import { cn } from "@/lib/utils";
 // import { Icons } from "@/components/icons"
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { toggleSet } from "../state/zustand"
+import { useTheme } from "next-themes";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -56,16 +57,16 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 export function NavigationMenuDemo() {
-  const { dark } = toggleDarkMode();
   const router = useRouter();
   const { setname, setSet } = toggleSet();
+  const { theme, setTheme } = useTheme();
 
   return (
     <NavigationMenu className="ml-5">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Play with flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={dark}>
+          <NavigationMenuContent className={`z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[350px] lg:grid-cols-[.75fr_1fr]">
               <NextLink href="allSets">
               <ListItem href="/docs/primitives/typography" title="routine resistor">
@@ -92,7 +93,7 @@ export function NavigationMenuDemo() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Create flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={dark}>
+          <NavigationMenuContent className={theme === 'light' ? 'bg-white' : 'bg-black'}>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {components.map((component) => (
                 <NextLink key={component.title} href={component.href}>
