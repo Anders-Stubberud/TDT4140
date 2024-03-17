@@ -53,7 +53,8 @@ export default function WelcomePage() {
 					  userID: user.uid,
 					  userName: `${resultRandomUsername}-${resultRandomUsername2}`,
 					  favourites: [],
-					  profilePictureURL: null
+					  profilePictureURL: null,
+					  admin: false
 					}),
 				  	});
 				  if (setupResponse.ok) {

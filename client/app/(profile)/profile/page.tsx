@@ -38,7 +38,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function ProfilePage() {
 
-  const { username, profileImageURL } = useUserStore();
+  const { username, profileImageURL } = useUserStore(); 
   const [userName, setUserNameLocal] = useState(username);
   const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand } = useUserStore();
   const [profilePicURL, setProfilePicURL] = useState<string | null>(profileImageURL);
@@ -47,6 +47,7 @@ export default function ProfilePage() {
   const auth = getAuth();
 	const [user] = useAuthState(auth);
   const notify = () => toast("User updated!");
+  const [adminStatus, setAdminStatus] = useState();
 
   const mimeToExt: Record<string, string> = {
     "jpeg": "jpg",
@@ -57,6 +58,9 @@ export default function ProfilePage() {
     try {
       const response = await fetch(serverEndpoint + `/api/getUserInformation/${user?.uid}`);
       const data = await response.json();
+      console.log(data);
+      setAdminStatus(data.admin);
+      console.log(adminStatus);
       setProfileImageURLZustand(data.profilePictureURL);
       setUserNameZustand(data.userName);
       setProfilePicURL(data.profilePictureURL);
@@ -121,7 +125,7 @@ export default function ProfilePage() {
 }
 
   return (
-    <div>
+    <div className="-mt-20">
       <div className="flex justify-center">
       {
       profilePic ? 
@@ -176,6 +180,14 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="space-y-1">
+                  <Label htmlFor="admin">Admin</Label>
+                  <Input
+                    id="admin"
+                    disabled
+                    value={adminStatus ? "You're an admin" : "Sorry, you're not an admin"}
+                  />
+                </div>
+                <div className="space-y-1">
                   <Label htmlFor="username">Username</Label>
                   <Input
                     id="username"
@@ -186,6 +198,10 @@ export default function ProfilePage() {
               </CardContent>
               <CardFooter className="flex justify-center">
                 <Button color="primary" onClick={() => sendPictureToDatabase()}>Save changes</Button>
+                <ToastContainer 
+                position="bottom-right"
+                theme="light"
+                />
               </CardFooter>
             </Card>
           </TabsContent>

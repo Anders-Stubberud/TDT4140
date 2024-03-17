@@ -283,6 +283,7 @@ app.post("/api/editUserProfile", mults.single("file"), async function (req, res,
 
     try {
         if (req.file) {
+            console.log(req.file.originalname);
             const file = req.file;
             const blob = bucket.file(file.originalname);
             const blobStream = blob.createWriteStream();
@@ -311,9 +312,16 @@ app.post("/api/editUserProfile", mults.single("file"), async function (req, res,
             });
         }
 
-        const uploadData = {
-            userName: userName,
-            profilePictureURL: profileImageURL
+        let uploadData;
+        if (profileImageURL) {
+            uploadData = {
+                userName: userName,
+                profilePictureURL: profileImageURL
+            }
+        } else {
+            uploadData = {
+                userName: userName,
+            }
         }
 
         await editUserInformation(userID, uploadData);
