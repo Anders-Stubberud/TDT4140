@@ -16,9 +16,9 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { Button } from "@nextui-org/react";
+import { Button, user } from "@nextui-org/react";
 import { CameraIcon } from "../../../icons/cameraIcon";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AvatarDemo } from "@/components/avatar";
 import { FlashyButton } from "@/components/borderFlash";
 import {Chip} from "@nextui-org/react";
@@ -30,19 +30,45 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { serverEndpoint, useUserStore } from "@/state/zustand";
+import { getAuth } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function ProfilePage() {
 
-  const [name, setName] = useState("Pedro Duarte");
-  const [userName, setUserName] = useState("@peduarte");
-  const [profilePicURL, setProfilePicURL] = useState<string>();
-	const [ profilePic, setProfilePic ] = useState<File>();
+  const { username, profileImageURL } = useUserStore();
+  const [userName, setUserNameLocal] = useState(username);
+  const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand } = useUserStore();
+  const [profilePicURL, setProfilePicURL] = useState<string | null>(profileImageURL);
+	const [ profilePic, setProfilePic ] = useState<File | null>(null);
   const fileInputRef = useRef(null);
+  const auth = getAuth();
+	const [user] = useAuthState(auth);
+  const notify = () => toast("User updated!");
 
   const mimeToExt: Record<string, string> = {
     "jpeg": "jpg",
     "png": "png",
   };
+
+  const setupUserInformation = async () => {
+    try {
+      const response = await fetch(serverEndpoint + `/api/getUserInformation/${user?.uid}`);
+      const data = await response.json();
+      setProfileImageURLZustand(data.profilePictureURL);
+      setUserNameZustand(data.userName);
+      setProfilePicURL(data.profilePictureURL);
+      setUserNameLocal(data.userName);
+    } catch (error) {
+      console.error("Error setting up user information:", error);
+    }
+  };
+
+  useEffect(() => {
+    setupUserInformation();
+  }, []);
 
   const sendPictureToDatabase = async () => {
     try {
@@ -59,11 +85,17 @@ export default function ProfilePage() {
       if (userID) {
         formData.append("userID", userID);
       }
-      formData.append("username", userName);
-      const response = await fetch("http://localhost:5001/api/editUserProfile", {
+      if (userName) {
+        console.log('username')
+        formData.append("userName", userName);
+      }
+      const response = await fetch(serverEndpoint + '/api/editUserProfile', {
         method: "POST",
         body: formData,
       });
+
+      setupUserInformation();
+      notify();
 
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -81,24 +113,37 @@ export default function ProfilePage() {
 	}
   };
 
+  function getInitials(fullName: string | null | undefined) {
+    if (!fullName) return ""; 
+    const words = fullName.split(" ");
+    const initials = words.map(word => word.charAt(0).toUpperCase());
+    return initials.join("");
+}
+
   return (
     <div>
       <div className="flex justify-center">
       {
       profilePic ? 
       <Avatar className="w-24 h-24">
-        <AvatarImage src="https://github.com/shadcn.png"/>
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
-      :       
+        <AvatarImage src={URL.createObjectURL(profilePic)}/>
+        <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+      </Avatar> 
+      :
+      profilePicURL ? 
       <Avatar className="w-24 h-24">
-        <AvatarImage src=""/>
-        <AvatarFallback>CN</AvatarFallback>
+        <AvatarImage src={profilePicURL}/>
+        <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+      </Avatar>    
+      :
+      <Avatar className="w-24 h-24">
+        <AvatarImage src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/510px-Default_pfp.svg.png'/>
+        <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
       </Avatar>
       }
       </div>
       <Button
-        color="success"
+        color="primary"
         className="mt-2"
         endContent={<CameraIcon />}
         onClick={handleButtonClick}
@@ -126,21 +171,21 @@ export default function ProfilePage() {
                   <Label htmlFor="name">Name</Label>
                   <Input
                     id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    disabled
+                    value={user?.displayName ? user.displayName : 'filern'}
                   />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="username">Username</Label>
                   <Input
                     id="username"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
+                    value={userName ? userName : ""}
+                    onChange={(e) => setUserNameLocal(e.target.value)}
                   />
                 </div>
               </CardContent>
               <CardFooter className="flex justify-center">
-                <Button onClick={() => sendPictureToDatabase()}>Save changes</Button>
+                <Button color="primary" onClick={() => sendPictureToDatabase()}>Save changes</Button>
               </CardFooter>
             </Card>
           </TabsContent>

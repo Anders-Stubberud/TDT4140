@@ -40,7 +40,8 @@ const uploadUser = async (userID, data) => {
 
 const editUserInformation = async (userID, data) => {
     await updateDoc(doc(db, userCollection, userID), {
-        data
+        userName: data.userName,
+        profilePictureURL: data.profilePictureURL
     })
 }
 

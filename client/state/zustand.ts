@@ -32,12 +32,20 @@ export const useFavouriteSets = create<favourite_sets>()((set) => ({
 }))
 interface userLoggedIn {
     userID: string | undefined;
-    setUserID: (userID: string | undefined) => void
+    username: string | null
+    profileImageURL: string | null
+    setProfileImageURLZustand: (profileImageURL: string | null) => void
+    setUserNameZustand: (username: string) => void
+    setUserIDZustand: (userID: string | undefined) => void
 }
 
 export const useUserStore = create<userLoggedIn>()((set) => ({
     userID: "",
-    setUserID: (newUserID: string | undefined) => set({ userID: newUserID })
+    username: null,
+    profileImageURL: null,
+    setProfileImageURLZustand: (newProfileImageURL: string | null) => set({ profileImageURL: newProfileImageURL }),
+    setUserNameZustand: (newUserName: string | null) => set({ username: newUserName }),
+    setUserIDZustand: (newUserID: string | undefined) => set({ userID: newUserID })
 }))
 
 interface setInfo {

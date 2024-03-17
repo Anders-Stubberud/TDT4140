@@ -46,11 +46,11 @@ export const LoggedInNavbar = () => {
   const {setIsLoggedIn} = zustand();
   const auth = getAuth();
   const [user] = useAuthState(auth);
-  const { setUserID } = useUserStore();
+  const { setUserIDZustand, username, profileImageURL } = useUserStore();
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-      setUserID(user?.uid);
+      setUserIDZustand(user?.uid);
   }, [])
 
   const searchInput = (

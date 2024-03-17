@@ -46,10 +46,20 @@ admin.initializeApp({
     storageBucket: 'gs://flashy-3a502.appspot.com'
 });
 
+app.get("/api/getUserInformation/:userID", async (req, res) => {
+    try {
+        const userID = req.params.userID;
+        const data = await fetchUser(userID);
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    } 
+})
+
 app.get("/api/getFlashcards", async (req, res) => {
     try {
         const data = await flashcards();
-        console.log("51" + data.json);
+        console.log("61" + data.json);
         res.send(data);
     } catch (error) {
         console.log(error)
@@ -142,13 +152,24 @@ app.post("/api/removeFavourite", async (req, res) => {
     }
 })
 
+app.get("/api/userExists/:id", async (req, res) => {
+    try {
+        const userID = req.params.id;
+        const user = await fetchUser(userID);
+        const userExists = !!user;
+        res.json({ userExists });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.post('/api/setupUser', async (req, res) => {
     const { userID } = req.body
     const user = req.body
-
+    console.log('punch');
     try {
-
-        if (!fetchUser(userID)) {
+        if (! await fetchUser(userID)) {
             await uploadUser(userID, user);
         }
 
@@ -256,7 +277,7 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
 
 app.post("/api/editUserProfile", mults.single("file"), async function (req, res, next) {
 
-    const { userID, username } = req.body;
+    const { userID, userName } = req.body;
 
     var profileImageURL = null
 
@@ -276,7 +297,7 @@ app.post("/api/editUserProfile", mults.single("file"), async function (req, res,
                             action: 'read',
                             expires: expiration,
                         });
-                        profileImageURL = signedUrl;
+                        profileImageURL = signedUrl[0];
                         resolve();
                     } catch (error) {
                         reject(error);
@@ -291,7 +312,7 @@ app.post("/api/editUserProfile", mults.single("file"), async function (req, res,
         }
 
         const uploadData = {
-            username: username,
+            userName: userName,
             profilePictureURL: profileImageURL
         }
 
