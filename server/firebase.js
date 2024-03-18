@@ -47,6 +47,13 @@ const getTags = async () => {
     return data;
 } 
 
+const sendTag = async (tag) => {
+    const previous = await fetchData('assorted', 'tags');
+    const arr = previous.tagsArr;
+    const newArr = [...arr, tag];
+    await setDoc(doc(db, 'assorted', 'tags'), { tagsArr: newArr });
+}
+
 const fetchUser = async (userID) => {
     
     const docSnap = await (getDoc(doc(db, userCollection, userID)))
@@ -213,5 +220,6 @@ module.exports = {
     fetchFavourites,
     fetchUser,
     editUserInformation,
-    getTags
+    getTags,
+    sendTag
 };

@@ -34,7 +34,7 @@ const cloudStorage = new Storage({
 });
 const bucketName = "gs://flashy-3a502.appspot.com";
 const bucket = cloudStorage.bucket(bucketName);
-const {db, uploadData, fetchData, getTags, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
+const {db, uploadData, fetchData, getTags, sendTag, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 const { getStorage, ref, uploadBytes } = 'firebase/storage';
 app.use(express.json());
@@ -114,6 +114,17 @@ app.get("/api/getTags", async (req, res) => {
         console.log(e)
     }
 })
+
+app.get("/api/newTag/:tag", async (req, res) => {
+    try {
+        const tag = req.params.tag;
+        const data = await sendTag(tag);
+        res.send(data);
+    } catch (e) {
+        console.log(e)
+    }
+})
+
 
 app.post("/api/deleteSet", async (req, res) => {
     try {

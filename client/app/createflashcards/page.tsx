@@ -25,6 +25,7 @@ import { MultiStepLoaderDemo } from "@/components/multisteploader";
 import { flashcard, flashcardSet } from "@/state/zustand";
 import { title } from "process";
 import axios from "axios";
+import {Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 
 export default function CreateflashcardsPage(navigationData: any) {
 
@@ -283,12 +284,26 @@ export default function CreateflashcardsPage(navigationData: any) {
 
   const [description, setDescription] = useState('');
 
+  const [newTagBame, setNewTagName] = useState('');
+
   const handleChangeTitle = (event: any) => {
     setSetTitle(event.target.value);
   };
 
   const handleDescriptionChange = (event: any) => {
     setDescription(event.target.value);
+  };
+
+  const handleNewTagname = (event: any) => {
+    setNewTagName(event.target.value);
+  };
+
+  const handleAddTag = async (event: any) => {
+    const response = await fetch(`${serverEndpoint}/api/newTag/${newTagBame}`);
+    const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
+    const taggies = await taggiesRAW.json();
+    const tagsArr = taggies.tagsArr;
+    setTags(tagsArr);
   };
 
   return (
@@ -309,30 +324,61 @@ export default function CreateflashcardsPage(navigationData: any) {
             value={description} 
             onChange={handleDescriptionChange}
             placeholder="Include short description"
-            className="h-full"
+            className="h-full w-full"
           />
           <Divider orientation="vertical" className="mx-4"/>
           <div className="">
-            <Button
-              color="primary"
-              className="w-full mb-1"
-              endContent={<CameraIcon />}
-              onClick={handleButtonClick}
-            >
-              Upload cover image
-            </Button>
+            <div className="flex">
+              <Button
+                color="primary"
+                className="w-full mb-1"
+                endContent={<CameraIcon />}
+                onClick={handleButtonClick}
+              >
+                Upload cover image
+              </Button>
+              <Popover placement="bottom" showArrow offset={10}>
+                <PopoverTrigger>
+                <Button
+                  color="primary"
+                  className="ml-1 mb-2"
+                >
+                  Add tag
+                </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[240px]">
+                  {(titleProps) => (
+                    <div className="px-1 py-2 w-full">
+                      <p className="text-small font-bold text-foreground" {...titleProps}>
+                        New tag
+                      </p>
+                      <div className="mt-2 flex flex-col gap-2 w-full">
+                        <Input value={newTagBame} onChange={handleNewTagname} label="New tag name" size="sm" variant="bordered" />
+                        <Button
+                        color="primary"
+                        onClick={handleAddTag}
+                        className="ml-1 mb-2"
+                      >
+                        Add
+                      </Button>
+                      </div>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
             <input
               type="file"
               ref={fileInputRef}
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
-            <div className="w-56">
+            <div >
             <Select
               label="Tags"
-              placeholder="Select tag"
+              placeholder="Select tags"
               selectionMode="multiple"
-              className="max-w-xs"
+              fullWidth
               selectedKeys={selectedItems}
               onChange={handleSelectionChange}
             >
