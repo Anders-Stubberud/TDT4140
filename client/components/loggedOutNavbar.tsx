@@ -17,8 +17,7 @@ import { link as linkStyles } from "@nextui-org/theme";
 
 import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
-import clsx from "clsx";
-
+import { SheetDemo } from "./sheet";
 import { useEffect } from "react";
 import { zustand } from "../state/zustand";
 import { ThemeSwitch } from "@/components/theme-switch";
@@ -35,12 +34,17 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../firebase.js";
 import { signOut } from "firebase/auth";
 import { Bot } from "lucide-react";
+import { NavigationMenuDemo2 } from "./navigationmenu2";
+import { AvatarDemo } from "./avatar";
+import {Button} from "@nextui-org/react";
+import { useUserStore } from "../state/zustand";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+
 export const LoggedOutNavbar = () => {
 
-  const app = initializeApp(firebaseConfig);
-  const {setIsLoggedIn} = zustand();
-  const auth = getAuth();
-  const [user] = useAuthState(auth);
+  const { theme, setTheme } = useTheme();
+  const router = useRouter();
 
   const searchInput = (
     <Input
@@ -64,7 +68,7 @@ export const LoggedOutNavbar = () => {
   );
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky">
+    <NextUINavbar maxWidth="xl" position="sticky" className={`z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
@@ -72,22 +76,6 @@ export const LoggedOutNavbar = () => {
             <p className="font-bold text-inherit">FLASHY</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium"
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
       </NavbarContent>
 
       <NavbarContent
@@ -105,29 +93,9 @@ export const LoggedOutNavbar = () => {
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                    ? "danger"
-                    : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
+      <Button onClick={() => router.push('/login')}>
+          Let's go
+      </Button>
     </NextUINavbar>
   );
 };

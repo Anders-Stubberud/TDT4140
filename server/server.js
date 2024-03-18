@@ -248,10 +248,7 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
                 return;
             }
         });
-        console.log(newCardToURLMapper);
-        console.log(JSON.parse(textRelatedToFlashcards));
-        console.log(typeof newCardToURLMapper);
-        console.log(newCardToURLMapper.hasOwnProperty(`answer-38e9cdbd-03ec-4568-a444-a1608a0c7eaa`));
+
         const uploadData = {
             creatorID: creatorID,
             numberOfLikes: parseInt(numberOfLikes),
