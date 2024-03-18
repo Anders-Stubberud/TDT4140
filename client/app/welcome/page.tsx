@@ -5,7 +5,7 @@ import { title } from "@/components/primitives";
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { zustand, useUserStore, user } from "../../state/zustand";
+import { zustand, useUserStore, user, tagsAvailable } from "../../state/zustand";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
@@ -20,6 +20,7 @@ export default function WelcomePage() {
 	const auth = getAuth();
 	const [user] = useAuthState(auth);
 	const apiURL = "http://localhost:5001/api";
+	const { tags, setTags } = tagsAvailable();
 
 	const url = 'https://random-words5.p.rapidapi.com/getRandom';
 	const options = {
@@ -152,6 +153,10 @@ export default function WelcomePage() {
 				const res = await fetch(apiURL + `/getUserInformation/${user?.uid}`);
 				const data = await res.json();
 				setIsAdmin(data.admin);
+				const taggiesRAW = await fetch(`${apiURL}/getTags`);
+				const taggies = await taggiesRAW.json();
+				const tagsArr = taggies.tagsArr;
+				setTags(tagsArr);
 				localStorage.setItem('admin', data.admin);
 				localStorage.setItem('profilePictureURL', data.profilePictureURL);
 				setProfileImageURLZustand(data.profilePictureURL);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { flashcard, flashcardSet, JSONToFlashcardSet, serverEndpoint } from '@/state/zustand';
+import { flashcard, flashcardSet, JSONToFlashcardSet, serverEndpoint, tagsAvailable } from '@/state/zustand';
 import FlashcardSetList from './flashcardSetList';
 import { changeChosenSet } from '@/state/zustand';
 
@@ -8,6 +8,7 @@ const FlashcardSetListDisplay: React.FC = () => {
   const [num, setNum] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {sett, setSett} = changeChosenSet();
+  const { tags, setTags } = tagsAvailable();
 
   useEffect(() => {
     const fetchData = async () => {

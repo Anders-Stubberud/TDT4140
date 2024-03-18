@@ -9,7 +9,7 @@ import { Textarea } from "@nextui-org/input";
 import { Divider } from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { changeUserInfo, editTheSet, serverEndpoint } from "@/state/zustand";
+import { changeUserInfo, editTheSet, serverEndpoint, tagsAvailable } from "@/state/zustand";
 import { useRef } from "react";
 import { CameraIcon } from "../../icons/cameraIcon";
 import { AvatarDemo } from "@/components/avatar";
@@ -29,6 +29,7 @@ import axios from "axios";
 export default function CreateflashcardsPage(navigationData: any) {
 
   const [coverImage, setCoverImage] = useState<any>();
+  const { tags, setTags } = tagsAvailable();
   const [coverImageURL, setCoverImageURL] = useState<string | null>(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
@@ -335,19 +336,8 @@ export default function CreateflashcardsPage(navigationData: any) {
               selectedKeys={selectedItems}
               onChange={handleSelectionChange}
             >
-      {[
-        { value: 'math', label: 'Mathematics' },
-        { value: 'science', label: 'Natural Sciences' },
-        { value: 'english', label: 'English Language Arts' },
-        { value: 'history', label: 'History' },
-        { value: 'geography', label: 'Geography' },
-        { value: 'foreign_languages', label: 'Foreign Languages' },
-        { value: 'art', label: 'Art' },
-        { value: 'music', label: 'Music' },
-        { value: 'physical_education', label: 'Physical Education' },
-        { value: 'computer_science', label: 'Computer Science' }
-      ].map((item) => (
-        <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+      {tags.map((item) => (
+        <SelectItem key={item} value={item}>{item}</SelectItem>
       ))}
     </Select>
             </div>

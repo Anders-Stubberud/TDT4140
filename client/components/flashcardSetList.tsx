@@ -3,6 +3,7 @@ import { flashcardSet, serverEndpoint, useFavouriteSets } from "@/state/zustand"
 import { useEffect, useState } from "react";
 import { ThreeDCardDemo } from "./threeDCard";
 import { PaginationDemo } from "./pagination";
+import { tagsAvailable } from "@/state/zustand";
 
 interface FlashcardSetListProps {
   flashcardSets: flashcardSet[];
@@ -17,6 +18,7 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
 }) => {
   const [index, setIndex] = useState<number>(0);
   const { favourites, setFavourites } = useFavouriteSets();
+  const { tags, setTags } = tagsAvailable();
 
   const chunkArray = (array: any[], size: number) => {
     return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
@@ -34,13 +36,16 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
         favs.push(data[i].flashcardSetID)
       } 
       setFavourites(favs);
+      const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
+      const taggies = await taggiesRAW.json();
+      const tagsArr = taggies.tagsArr;
+      setTags(tagsArr);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    console.log(flashcardSets);
     fetchData(); // Trigger on render
   }, []); // Empty dependency array means it runs once on mount
 
@@ -50,7 +55,9 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
   return (
     <div>
       {isLoading ? (
-        <Spinner />
+        <div className="flex justify-center mt-10">
+          <Spinner />
+        </div>
       ) : (
         <div>
           {threeByThree[index]?.map((row, rowIndex) => (

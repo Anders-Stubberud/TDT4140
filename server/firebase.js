@@ -42,6 +42,11 @@ const editUserInformation = async (userID, data) => {
     await updateDoc(doc(db, userCollection, userID), data)
 }
 
+const getTags = async () => {
+    const data = await fetchData('assorted', 'tags');
+    return data;
+} 
+
 const fetchUser = async (userID) => {
     
     const docSnap = await (getDoc(doc(db, userCollection, userID)))
@@ -207,5 +212,6 @@ module.exports = {
     removeFavourite,
     fetchFavourites,
     fetchUser,
-    editUserInformation
+    editUserInformation,
+    getTags
 };
