@@ -298,11 +298,14 @@ export default function CreateflashcardsPage(navigationData: any) {
     setNewTagName(event.target.value);
   };
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const handleAddTag = async (event: any) => {
     const response = await fetch(`${serverEndpoint}/api/newTag/${newTagBame}`);
     const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
     const taggies = await taggiesRAW.json();
     const tagsArr = taggies.tagsArr;
+    setIsOpen(false);
     setTags(tagsArr);
   };
 
@@ -337,11 +340,12 @@ export default function CreateflashcardsPage(navigationData: any) {
               >
                 Upload cover image
               </Button>
-              <Popover placement="bottom" showArrow offset={10}>
+              <Popover placement="bottom" showArrow offset={10} isOpen={isOpen}>
                 <PopoverTrigger>
                 <Button
                   color="primary"
                   className="ml-1 mb-2"
+                  onClick={() => setIsOpen(true)}
                 >
                   Add tag
                 </Button>
