@@ -1,17 +1,8 @@
-import { Card, CardBody, CardFooter, Image, Spinner } from "@nextui-org/react";
-import {
-  flashcard,
-  flashcardSet,
-  serverEndpoint,
-  useUserStore,
-} from "@/state/zustand";
+import { Spinner } from "@nextui-org/react";
+import { flashcardSet, serverEndpoint, useFavouriteSets } from "@/state/zustand";
+import { useEffect, useState } from "react";
 import { ThreeDCardDemo } from "./threeDCard";
 import { PaginationDemo } from "./pagination";
-import { useEffect, useState } from "react";
-import FavouriteButton from "./favourite-button";
-import { getAuth } from "firebase/auth";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useFavouriteSets } from "@/state/zustand";
 
 interface FlashcardSetListProps {
   flashcardSets: flashcardSet[];
@@ -24,9 +15,9 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
   number,
   isLoading,
 }) => {
-  // const [favourites, setFavourites] = useState<string []>([]);
   const [index, setIndex] = useState<number>(0);
   const { favourites, setFavourites } = useFavouriteSets();
+
   const chunkArray = (array: any[], size: number) => {
     return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
       array.slice(index * size, index * size + size)
@@ -54,17 +45,18 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
   }, []); // Empty dependency array means it runs once on mount
 
   const flashcardSetsGroups = chunkArray(flashcardSets, 3);
+  const threeByThree = chunkArray(flashcardSetsGroups, 3);
 
   return (
     <div>
       {isLoading ? (
-        <Spinner></Spinner>
+        <Spinner />
       ) : (
         <div>
-          {flashcardSetsGroups[index] ? (
-            <div className="flex justify-between">
-              {flashcardSetsGroups[index].map((flashcardSet, index) => (
-                <div key={index} className="ml-10 mr-10">
+          {threeByThree[index]?.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex justify-center mt-4">
+              {row.map((flashcardSet: any, cardIndex: any) => (
+                <div key={cardIndex} className="ml-10 mr-10">
                   <ThreeDCardDemo
                     id={flashcardSet.flashcardSetID}
                     creatorID={flashcardSet.creatorID}
@@ -73,25 +65,22 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
                     description={flashcardSet.description}
                     buttonText="Play"
                     favourite={favourites.includes(flashcardSet.flashcardSetID)}
-                  ></ThreeDCardDemo>
+                  />
                 </div>
               ))}
             </div>
-          ) : (
-            <p>No learning sets available</p>
-          )}
+          ))}
           <div className="mt-10">
             <PaginationDemo
-              number={number}
+              number={threeByThree.length}
               index={index}
               setIndex={setIndex}
-            ></PaginationDemo>
+            />
           </div>
         </div>
       )}
     </div>
   );
 };
-
 
 export default FlashcardSetList;

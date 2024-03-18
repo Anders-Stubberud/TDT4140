@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button, Select, SelectItem } from "@nextui-org/react";
 import { serverEndpoint, flashcardSet } from "@/state/zustand";
 import { changeChosenSet } from "@/state/zustand";
+import SortIcon from "@/icons/sortIcon";
 
 export default function SearchBar({ setData, setNum, setIsLoading, data }: any ) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,19 +49,54 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
   
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex justify-between px-14">
+
       <Input
-        type="email"
         placeholder="Search for set"
         variant="bordered"
-        className="flex-1"
+        className="w-80"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <Button onClick={handleSearch} color="primary">
-        Search
-      </Button>
-      <Button color="secondary">Filter</Button>
+
+      <Select
+        label="Tags"
+        placeholder="Select tags"
+        selectionMode="multiple"
+        className="w-80"
+        variant="bordered"
+              >
+        {[
+          { value: 'math', label: 'Mathematics' },
+          { value: 'science', label: 'Natural Sciences' },
+          { value: 'english', label: 'English Language Arts' },
+          { value: 'history', label: 'History' },
+          { value: 'geography', label: 'Geography' },
+          { value: 'foreign_languages', label: 'Foreign Languages' },
+          { value: 'art', label: 'Art' },
+          { value: 'music', label: 'Music' },
+          { value: 'physical_education', label: 'Physical Education' },
+          { value: 'computer_science', label: 'Computer Science' }
+        ].map((item) => (
+          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+        ))}
+      </Select>
+
+      <Select
+        label="Sort"
+        placeholder="Select sort key"
+        className="w-80"
+        variant="bordered"
+        startContent={<SortIcon />}
+              >
+        {[
+          { value: 'Most popular', label: 'Most popular' },
+          { value: 'Alphabetically', label: 'Alphabetically' },
+        ].map((item) => (
+          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+        ))}
+      </Select>
+
     </div>
-  );
+);
 }

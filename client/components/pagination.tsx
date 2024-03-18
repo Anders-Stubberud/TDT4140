@@ -22,7 +22,7 @@ export const PaginationDemo: React.FC<PaginationProps> = ({ number, index, setIn
     paginationItems.push(
       <PaginationItem key={i} >
         <PaginationLink href="#" onClick={() => setIndex(i)} isActive={index == i}>
-          {i}
+          {i + 1}
         </PaginationLink>
       </PaginationItem>
     );

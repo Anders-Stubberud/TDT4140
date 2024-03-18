@@ -168,3 +168,23 @@ export const editTheSet = create<cardEdit>()((set) => ({
     idOfSetToEdit: null,
     setIdOfSetToEdit: (wannaEdit: string | null) => set({idOfSetToEdit: wannaEdit})
 }))
+
+export interface availableTags {
+    tags: string[]
+    setTags: (newTags: string []) => void;
+}
+
+export const tagsAvailable = create<availableTags>()((set) => ({
+    tags: [],
+    setTags: (newTags: string []) => set({tags: newTags}),
+}))
+
+export interface indexing {
+    indexZustand: any
+    setIndexZustand: (newIndex: number) => void;
+}
+
+export const editIndexing = create<indexing>()((set) => ({
+    indexZustand: 0,
+    setIndexZustand: (newIndex: number) => set({indexZustand: newIndex}),
+}))

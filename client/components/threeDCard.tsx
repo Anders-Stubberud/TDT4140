@@ -146,7 +146,7 @@ export function ThreeDCardDemo({
             alt="thumbnail"
           />
         </CardItem>
-        <div className="mx-auto items-center mt-10" onClick={() => setSet(id)}>
+        <div className="mx-auto flex justify-center mt-10" onClick={() => setSet(id)}>
           <NextLink href="/displayFlashcardSet">
             <CardItem
               translateZ={20}

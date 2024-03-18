@@ -73,7 +73,7 @@ export function NavigationMenuDemo() {
                 View all sets
               </ListItem>
               </NextLink>
-              <NextLink href="allSets">
+              <NextLink href="filterSets">
                 <ListItem title="stability stalwart">
                   Filters and searching
                 </ListItem>
