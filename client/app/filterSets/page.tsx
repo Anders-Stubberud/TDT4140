@@ -18,10 +18,6 @@ export default function filterSetsPage() {
 
   const { indexZustand, setIndexZustand } = editIndexing();
 
-  useEffect(() => {
-    console.log(tags);
-  })
-
   return (
     <div>
       <SearchBar setData={setData} setNum ={setNum} setIsLoading={setIsLoading}/>

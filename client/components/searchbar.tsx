@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, SelectItem } from "@nextui-org/react";
-import { serverEndpoint, flashcardSet } from "@/state/zustand";
+import { serverEndpoint, flashcardSet, tagsAvailable } from "@/state/zustand";
 import { changeChosenSet } from "@/state/zustand";
 import SortIcon from "@/icons/sortIcon";
 
@@ -8,6 +8,11 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
   const [searchTerm, setSearchTerm] = useState("");
   const [first, setFirst] = useState(true);
   const { sett, setSett } = changeChosenSet();
+  const { tags, setTags } = tagsAvailable();
+
+  function isSubset(subset: string [], superset: string []) {
+    return subset.every(item => superset.includes(item));
+  }  
 
   const handleSearch = async () => {
     const endpoint = serverEndpoint + '/api/getFlashcards';
@@ -34,19 +39,52 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         console.log(err);
       }
     } else {
-      const filteredData: any[] = sett.filter((value: any) => value.setTitle.toLowerCase().startsWith(searchTerm.toLowerCase()));
-      setData(filteredData);
-      setNum(Math.ceil(filteredData.length / 3))
-      setIsLoading(false);
+      const filteredData: any[] = sett.filter((value: any) =>
+      value.setTitle.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+      isSubset(selectedItems.filter(str => str !== ''), value.tags)
+    );
+     
+      if (selectedItemsSort.length == 0) {
+        setData(filteredData);
+        setNum(Math.ceil(filteredData.length / 3))
+        setIsLoading(false);
+      }
+      else if (selectedItemsSort[0] == 'Alphabetically') {
+          const sortedData = [...filteredData].sort((a, b) =>
+          a.setTitle.localeCompare(b.setTitle)
+        );
+        setData(sortedData);
+        setNum(Math.ceil(sortedData.length / 3));
+        setIsLoading(false);
+      }
+      else if (selectedItemsSort[0] == 'Most popular') {
+        // after implementing number of likes onto the sets
+        setData(filteredData); // same as if no sorting
+        setNum(Math.ceil(filteredData.length / 3))
+        setIsLoading(false);
+      }
     }
   };
 
+  const [selectedItems, setSelectedItems] = useState<string []>([]); //tags
+
+  const handleSelectionChange = (event: any) => {
+    const selectedItems = event.target.value;
+    const arr = selectedItems.split(",");
+    setSelectedItems(arr);
+  };   
+
+  const [selectedItemsSort, setSelectedItemsSort] = useState<string []>([]); //gives array with 1 item
+
+  const handleSelectionChangeSort = (event: any) => {
+    const selectedItems = event.target.value;
+    const arr = selectedItems.split(",");
+    setSelectedItemsSort(arr);
+  };  
+
   useEffect(() => {
     handleSearch();
-  }, [searchTerm]);
-
-
-  
+  }, [searchTerm, selectedItems, selectedItemsSort]);   
 
   return (
     <div className="flex justify-between px-14">
@@ -65,20 +103,11 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         selectionMode="multiple"
         className="w-80"
         variant="bordered"
+        selectedKeys={selectedItems}
+        onChange={handleSelectionChange}
               >
-        {[
-          { value: 'math', label: 'Mathematics' },
-          { value: 'science', label: 'Natural Sciences' },
-          { value: 'english', label: 'English Language Arts' },
-          { value: 'history', label: 'History' },
-          { value: 'geography', label: 'Geography' },
-          { value: 'foreign_languages', label: 'Foreign Languages' },
-          { value: 'art', label: 'Art' },
-          { value: 'music', label: 'Music' },
-          { value: 'physical_education', label: 'Physical Education' },
-          { value: 'computer_science', label: 'Computer Science' }
-        ].map((item) => (
-          <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+        {tags.map((item) => (
+          <SelectItem key={item} value={item}>{item}</SelectItem>
         ))}
       </Select>
 
@@ -87,6 +116,8 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         placeholder="Select sort key"
         className="w-80"
         variant="bordered"
+        selectedKeys={selectedItemsSort}
+        onChange={handleSelectionChangeSort}
         startContent={<SortIcon />}
               >
         {[
