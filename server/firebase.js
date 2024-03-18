@@ -39,10 +39,7 @@ const uploadUser = async (userID, data) => {
 }
 
 const editUserInformation = async (userID, data) => {
-    await updateDoc(doc(db, userCollection, userID), {
-        userName: data.userName,
-        profilePictureURL: data.profilePictureURL
-    })
+    await updateDoc(doc(db, userCollection, userID), data)
 }
 
 const fetchUser = async (userID) => {

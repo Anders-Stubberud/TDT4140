@@ -282,8 +282,7 @@ app.post("/api/editUserProfile", mults.single("file"), async function (req, res,
     var profileImageURL = null
 
     try {
-        if (req.file) {
-            console.log(req.file.originalname);
+        if (req.file != undefined) {
             const file = req.file;
             const blob = bucket.file(file.originalname);
             const blobStream = blob.createWriteStream();

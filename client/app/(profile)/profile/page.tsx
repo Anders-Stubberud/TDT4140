@@ -39,7 +39,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function ProfilePage() {
 
   const { username, profileImageURL } = useUserStore(); 
-  const [userName, setUserNameLocal] = useState(username);
+  const [userName, setUserNameLocal] = useState<string>("");
   const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand } = useUserStore();
   const [profilePicURL, setProfilePicURL] = useState<string | null>(profileImageURL);
 	const [ profilePic, setProfilePic ] = useState<File | null>(null);
@@ -89,10 +89,7 @@ export default function ProfilePage() {
       if (userID) {
         formData.append("userID", userID);
       }
-      if (userName) {
-        console.log('username')
-        formData.append("userName", userName);
-      }
+      formData.append("userName", userName);
       const response = await fetch(serverEndpoint + '/api/editUserProfile', {
         method: "POST",
         body: formData,
@@ -176,7 +173,7 @@ export default function ProfilePage() {
                   <Input
                     id="name"
                     disabled
-                    value={user?.displayName ? user.displayName : 'filern'}
+                    value={user?.displayName ? user.displayName : ''}
                   />
                 </div>
                 <div className="space-y-1">
