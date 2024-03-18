@@ -54,6 +54,15 @@ const sendTag = async (tag) => {
     await setDoc(doc(db, 'assorted', 'tags'), { tagsArr: newArr });
 }
 
+const increaseLikeCount = async (id, value) => {
+    const previous = await fetchFlashcardSet(id);
+    const previosuLikeCount = previous.numberOfLikes;
+    const newLikeCount = previosuLikeCount + value;
+    await updateDoc(doc(db, flashcardSetCollection, id), {
+        numberOfLikes: newLikeCount
+    })
+}
+
 const fetchUser = async (userID) => {
     
     const docSnap = await (getDoc(doc(db, userCollection, userID)))
@@ -221,5 +230,6 @@ module.exports = {
     fetchUser,
     editUserInformation,
     getTags,
-    sendTag
+    sendTag,
+    increaseLikeCount
 };

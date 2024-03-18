@@ -4,7 +4,7 @@ import {Image} from "@nextui-org/react";
 import NextImage from "next/image";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
-import { editTheSet, toggleSet, useUserStore, zustand } from "@/state/zustand";
+import { editTheSet, toggleSet, useUserStore, zustand , changeChosenSet} from "@/state/zustand";
 import NextLink from "next/link";
 import FavouriteButton from "./favourite-button";
 import { TrashCanIcon } from "@/icons/trashcan";
@@ -28,7 +28,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
-
 interface ThreeDCardProps {
   title: string;
   description: string;
@@ -56,10 +55,16 @@ export function ThreeDCardDemo({
   const { isAdmin, setIsAdmin, setProfileImageURLZustand } = useUserStore();
   const router = useRouter();
   const { setIdOfSetToEdit } = editTheSet();
+  const [numerOfLikes, setNumberOfLikes] = useState<number>(0);
+  const { sett, setSett } = changeChosenSet();
 
   useEffect(() => {
     setIsAdmin(localStorage.getItem('admin') === 'true');
     setProfileImageURLZustand(localStorage.getItem('profilePictureURL'));
+    console.log(sett);
+    const numLikes = sett.find((item) => item.flashcardSetID == id).numberOfLikes;
+    console.log(numLikes);
+    setNumberOfLikes(numLikes)
   }, [])
 
   const handleDelete = async () => {
@@ -88,6 +93,8 @@ export function ThreeDCardDemo({
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[20rem] h-auto rounded-xl p-6 border  ">
         <FavouriteButton
+          numberOfLikes={numerOfLikes}
+          setNumberOfLikes={setNumberOfLikes}
           flashcardSetID={id}
           isFavorite={favourite}
           userID={user?.uid}

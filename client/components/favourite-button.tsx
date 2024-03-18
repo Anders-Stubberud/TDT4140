@@ -10,12 +10,16 @@ interface FavouriteButtonProps {
   flashcardSetID: string;
   isFavorite: boolean;
   userID: string | undefined;
+  numberOfLikes: number;
+  setNumberOfLikes: (n: number) => void;
 }
 
 function FavouriteButton({
   flashcardSetID,
   isFavorite,
   userID,
+  numberOfLikes, 
+  setNumberOfLikes
 }: FavouriteButtonProps) {
   const [active, setActive] = useState(isFavorite);
 
@@ -24,6 +28,8 @@ function FavouriteButton({
   const handleToggleFavorite = async () => {
     try {
       if (favourites.includes(flashcardSetID)) {
+        const response = await fetch(`${serverEndpoint}/api/increaseLikeCount/${flashcardSetID}/-1`);
+        setNumberOfLikes(numberOfLikes - 1);
         const newarr: string [] = [];
         for (let i=0; i<favourites.length; i++) {
           if (favourites[i] != flashcardSetID) {
@@ -44,6 +50,8 @@ function FavouriteButton({
           }),
         });
       } else {
+        const response = await fetch(`${serverEndpoint}/api/increaseLikeCount/${flashcardSetID}/1`);
+        setNumberOfLikes(numberOfLikes + 1);
         setFavourites([...favourites, flashcardSetID])
         setActive(active);
         // Add to favorites
@@ -66,6 +74,7 @@ function FavouriteButton({
   return (
     <div style={{ width: "1.3rem" }}>
       <Heart isActive={favourites.includes(flashcardSetID)} onClick={handleToggleFavorite} />
+      <p>{numberOfLikes}</p>
     </div>
   );
 }
