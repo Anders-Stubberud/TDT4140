@@ -28,6 +28,7 @@ function FavouriteButton({
   const { favourites, setFavourites } = useFavouriteSets();
   const [active, setActive] = useState<boolean>(isFavorite);
   const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
+  const activeFromStart = isFavorite;
 
   const handleToggleFavorite = async () => {
     try {
@@ -77,6 +78,8 @@ function FavouriteButton({
       console.error("Error toggling favorite:", error);
     }
   };
+
+  const addLikeCount = active && !activeFromStart ? 1 : activeFromStart && !active ? -1 : 0
 
   return (
     <div style={{ width: "1.3rem" }}>

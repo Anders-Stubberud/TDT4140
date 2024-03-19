@@ -1,8 +1,9 @@
 // AvatarDemo.js
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { changeUserInfo, useUserStore } from "@/state/zustand";
+import { serverEndpoint } from '@/state/zustand';
 
 interface AvatarDemoProps {
   className?: string;
@@ -10,7 +11,7 @@ interface AvatarDemoProps {
 
 export function AvatarDemo({ className }: AvatarDemoProps) {
   const { profilePic } = changeUserInfo();
-  const { username, profileImageURL } = useUserStore();
+  const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, username, profileImageURL } = useUserStore();
 
   function getInitials(fullName: string | null | undefined) {
     if (!fullName) return "Profile"; 
@@ -22,8 +23,7 @@ export function AvatarDemo({ className }: AvatarDemoProps) {
   return (
     <div>
       <Avatar className={className}>
-        <AvatarImage src={profileImageURL ? profileImageURL : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/510px-Default_pfp.svg.png'} alt="profile" />
-        <AvatarFallback>{getInitials(username)}</AvatarFallback>
+      <AvatarImage src={profileImageURL ? profileImageURL : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/510px-Default_pfp.svg.png'} alt="profile" /><AvatarFallback>{getInitials(username)}</AvatarFallback>
       </Avatar>
     </div>
   );

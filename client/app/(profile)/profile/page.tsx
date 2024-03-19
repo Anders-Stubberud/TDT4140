@@ -62,6 +62,7 @@ export default function ProfilePage() {
       setAdminStatus(data.admin);
       console.log(adminStatus);
       setProfileImageURLZustand(data.profilePictureURL);
+      localStorage.setItem('profilePictureURL', data.profilePictureURL);
       setUserNameZustand(data.userName);
       setProfilePicURL(data.profilePictureURL);
       setUserNameLocal(data.userName);
