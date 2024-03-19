@@ -138,7 +138,7 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Checkbox className="mt-1" isSelected={isSelected} onValueChange={setIsSelected}>
-          Show favourites only
+          My favourite lists
         </Checkbox>
       </div>
 

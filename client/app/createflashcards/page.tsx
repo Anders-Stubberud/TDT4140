@@ -26,6 +26,8 @@ import { flashcard, flashcardSet } from "@/state/zustand";
 import { title } from "process";
 import axios from "axios";
 import {Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
+import {CheckboxGroup, Checkbox} from "@nextui-org/react";
+import { json } from "stream/consumers";
 
 export default function CreateflashcardsPage(navigationData: any) {
 
@@ -38,6 +40,7 @@ export default function CreateflashcardsPage(navigationData: any) {
   const [numberOfLikes, setNumberOfLikes] = useState<number>(0);
   const [localSetID, setLocalSetID] = useState<string | null>(null);
   const [cardIDToURLMapper, setItems] = useState({});
+  const [selectedPrivacy, setSelectedPrivacy] = useState<string []>([]);
   const addKeyValuePair = (key: any, value: any) => {
     setItems(prevItems => ({ ...prevItems, [key]: value }));
   };
@@ -69,6 +72,11 @@ export default function CreateflashcardsPage(navigationData: any) {
           const description = data.description;
           const tags = data.tags;
           const cveImageURL = data.coverImage;
+          const public_edit = data.public_edit;
+          const public_use = data.public_use;
+          console.log(data);
+          const statusArr = public_edit && public_use ? ['public_edit', 'public_use'] : public_edit && (! public_use) ? ['public_edit'] : (! public_edit) && public_use ? ['public_use'] : [];
+          setSelectedValues(statusArr);
           addKeyValuePair(idOfSetToEdit, cveImageURL);
           setSetTitle(title);
           setSelectedItems(tags);
@@ -261,6 +269,8 @@ export default function CreateflashcardsPage(navigationData: any) {
       console.log(cardIDToURLMapper);
       formData.append('cardIDToURLMapper', JSON.stringify(cardIDToURLMapper));
       formData.append('textRelatedToFlashcards', JSON.stringify(textRelatedToFlashcards));
+      formData.append('public_use', JSON.stringify(selectedValues.includes('public_use')));
+      formData.append('public_edit', JSON.stringify(selectedValues.includes('public_edit')));
 
       const response = await fetch("http://localhost:5001/api/upload", {
         method: "POST",
@@ -309,6 +319,21 @@ export default function CreateflashcardsPage(navigationData: any) {
     setTags(tagsArr);
   };
 
+  const handleOutsideDropdownClick = () => {
+    setIsOpen(false); // Close the popover
+    return true; // Always return true to close the popover when interacting outside
+  };
+
+  const [selectedValues, setSelectedValues] = useState<string []>([]);
+
+  const handleCheckboxChange = (values: any) => {
+    setSelectedValues(values);
+  };
+
+  useEffect(() => {
+    console.log(selectedValues);
+  }, [selectedValues])
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="w-1/2">
@@ -340,7 +365,7 @@ export default function CreateflashcardsPage(navigationData: any) {
               >
                 Upload cover image
               </Button>
-              <Popover placement="bottom" showArrow offset={10} isOpen={isOpen}>
+              <Popover shouldCloseOnInteractOutside={handleOutsideDropdownClick} placement="bottom" showArrow offset={10} isOpen={isOpen}>
                 <PopoverTrigger>
                 <Button
                   color="primary"
@@ -393,6 +418,20 @@ export default function CreateflashcardsPage(navigationData: any) {
             </div>
           </div>
         </div>
+        <CheckboxGroup
+          className="mt-2"
+          orientation="horizontal"
+          color="success"
+          value={selectedValues}
+          onChange={handleCheckboxChange}
+        >
+          <Checkbox value="public_edit" className="mr-12">
+            Allow other users to modify this set
+          </Checkbox>
+          <Checkbox value="public_use">
+            Allow other users to play this set
+          </Checkbox>
+        </CheckboxGroup>
         <Divider className="my-4" />
       </div>
       {cardFormArr.map((card, index) => (

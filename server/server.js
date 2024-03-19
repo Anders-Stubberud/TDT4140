@@ -247,7 +247,7 @@ app.post('/api/updateUser', async (req, res) => {
 
 app.post("/api/upload", mults.array("file"), async function (req, res, next) {
 
-    const { cardIDToURLMapper, flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
+    const { public_edit, public_use, cardIDToURLMapper, flashcardSetID, creatorID, setTitle, textRelatedToFlashcards, numberOfLikes, description, tags } = req.body;
 
     const newCardToURLMapper = JSON.parse(cardIDToURLMapper);
     const idToURLMapper = new Map();
@@ -296,6 +296,8 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
 
         const uploadData = {
             comments: [],
+            public_edit: public_edit,
+            public_use: public_use,
             creatorID: creatorID,
             numberOfLikes: parseInt(numberOfLikes),
             flashcardSetID: flashcardSetID,
