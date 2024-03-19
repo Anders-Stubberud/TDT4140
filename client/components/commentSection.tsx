@@ -12,16 +12,20 @@ interface props {
 export default function CommentSection({ comments, setID }: props) {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [cmt, setCmt] = useState<string>('');
-  const { username, profileImageURL } = useUserStore();
+  const { username, profileImageURL, setUserNameZustand } = useUserStore();
   const [localComments, setLocalComments] = useState<any>(comments);
 
   const handleCmtChange = (event: any) => {
     setCmt(event.target.value);
   }
 
-  const sendComment = () => {
+  const sendComment = async () => {
+    const res = await fetch(serverEndpoint + `/api/getUserInformation/${localStorage.getItem("userID")}`);
+    const data = await res.json();
+    const refreshedUserName = data.userName
+    setUserNameZustand(refreshedUserName);
     const newComment = {
-        username: username,
+        username: refreshedUserName,
         commentText: cmt,
         profileImageURL: profileImageURL,
         setID: setID
