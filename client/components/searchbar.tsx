@@ -4,6 +4,7 @@ import { serverEndpoint, flashcardSet, tagsAvailable, idToLikeStore } from "@/st
 import { changeChosenSet } from "@/state/zustand";
 import SortIcon from "@/icons/sortIcon";
 import {Checkbox} from "@nextui-org/react";
+import { editForAll } from "@/state/zustand";
 
 export default function SearchBar({ setData, setNum, setIsLoading, data }: any ) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,6 +12,7 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
   const { sett, setSett } = changeChosenSet();
   const { tags, setTags } = tagsAvailable();
   const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
+  const { editableSets, setEditableSets } = editForAll();
 
   function isSubset(subset: string [], superset: string []) {
     return subset.every(item => superset.includes(item));
@@ -37,9 +39,13 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         receivedData.forEach((element: any) => {
           updateIdToLikeMapper(element.flashcardSetID, element.numberOfLikes )
         });
-        setData(receivedData);
-        setSett(receivedData);
-        setNum(Math.ceil(receivedData.length / 3))
+        console.log(receivedData);
+        const editable = receivedData.filter((item: any) => item.public_edit == 'true').map((item: any) => item.flashcardSetID);
+        setEditableSets(editable);
+        const relevantData = receivedData.filter((item: any) => item.public_use == 'true' || item.creatorID == localStorage.getItem('userID'))
+        setData(relevantData);
+        setSett(relevantData);
+        setNum(Math.ceil(relevantData.length / 3))
         setIsLoading(false);
       } catch (err) {
         console.log(err);

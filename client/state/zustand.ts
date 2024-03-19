@@ -208,3 +208,13 @@ interface idToLike {
     },
   }));
 
+  export interface allCanEdit {
+    editableSets: string []
+    setEditableSets: (newSets: string []) => void;
+}
+
+export const editForAll = create<allCanEdit>()((set) => ({
+    editableSets: [],
+    setEditableSets: (newSets: string []) => set({editableSets: newSets}),
+}))
+

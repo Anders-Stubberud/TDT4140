@@ -72,9 +72,8 @@ export default function CreateflashcardsPage(navigationData: any) {
           const description = data.description;
           const tags = data.tags;
           const cveImageURL = data.coverImage;
-          const public_edit = data.public_edit;
-          const public_use = data.public_use;
-          console.log(data);
+          const public_edit = data.public_edit == 'true';
+          const public_use = data.public_use == 'true';
           const statusArr = public_edit && public_use ? ['public_edit', 'public_use'] : public_edit && (! public_use) ? ['public_edit'] : (! public_edit) && public_use ? ['public_use'] : [];
           setSelectedValues(statusArr);
           addKeyValuePair(idOfSetToEdit, cveImageURL);

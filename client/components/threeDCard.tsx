@@ -4,7 +4,7 @@ import {Image} from "@nextui-org/react";
 import NextImage from "next/image";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
-import { editTheSet, toggleSet, useUserStore, zustand , changeChosenSet} from "@/state/zustand";
+import { editTheSet, toggleSet, useUserStore, zustand , changeChosenSet, editForAll} from "@/state/zustand";
 import NextLink from "next/link";
 import FavouriteButton from "./favourite-button";
 import { TrashCanIcon } from "@/icons/trashcan";
@@ -63,6 +63,7 @@ export function ThreeDCardDemo({
   const { setIdOfSetToEdit } = editTheSet();
   const [numerOfLikes, setNumberOfLikes] = useState<number>(numberOfLikes);
   const { sett, setSett } = changeChosenSet();
+  const { editableSets } = editForAll();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,7 +116,7 @@ export function ThreeDCardDemo({
           comments={comments}
           ></CommentSection>
         </div>
-        {user?.uid == creatorID || isAdmin ? (
+        {user?.uid == creatorID || isAdmin || editableSets.includes(id) ? (
           <div className="absolute top-5 right-5 flex flex-row">
             <button className="mr-4" onClick={() => handleEditSet()}>
             <EditIcon></EditIcon>
