@@ -93,6 +93,23 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
     setSelectedItemsSort(arr);
   };  
 
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
+        const taggies = await taggiesRAW.json();
+        const tagsArr = taggies.tagsArr;
+        setTags(tagsArr);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+  
+    fetchData(); // Call the async function immediately
+  }, []);
+  
+
   useEffect(() => {
     handleSearch();
   }, [searchTerm, selectedItems, selectedItemsSort]);   
