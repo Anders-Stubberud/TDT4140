@@ -63,18 +63,11 @@ export function ThreeDCardDemo({
   const { setIdOfSetToEdit } = editTheSet();
   const [numerOfLikes, setNumberOfLikes] = useState<number>(numberOfLikes);
   const { sett, setSett } = changeChosenSet();
-  const [fav, setFav] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsAdmin(localStorage.getItem('admin') === 'true');
       setProfileImageURLZustand(localStorage.getItem('profilePictureURL'));
-      const userLikesTheseRAW = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
-      const userLikesThese = await userLikesTheseRAW.json();
-      console.log(userLikesThese);
-      const doesUserLikeThis = userLikesThese.some((elm: any) => elm != null && elm != undefined && elm.flashcardSetID == id);
-      console.log(id, doesUserLikeThis)
-      setFav(doesUserLikeThis);
       const numLikes = sett.find((item) => item.flashcardSetID == id).numberOfLikes;
       console.log(numLikes);
       setNumberOfLikes(numLikes);
@@ -106,10 +99,6 @@ export function ThreeDCardDemo({
     router.push('createflashcards');
   }
 
-  const handleComments = () => {
-
-  }
-
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[20rem] h-auto rounded-xl p-6 border  ">
@@ -118,7 +107,7 @@ export function ThreeDCardDemo({
             numberOfLikes={numerOfLikes}
             setNumberOfLikes={setNumberOfLikes}
             flashcardSetID={id}
-            isFavorite={fav}
+            isFavorite={favourite}
             userID={user?.uid}
           ></FavouriteButton>
           <CommentSection

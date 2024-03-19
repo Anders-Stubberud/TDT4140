@@ -20,6 +20,7 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
   const { favourites, setFavourites } = useFavouriteSets();
   const { tags, setTags } = tagsAvailable();
   const { sett } = changeChosenSet();
+  const [userLikesThese, setUserLikesThese] = useState<any []>([]);
 
   const chunkArray = (array: any[], size: number) => {
     return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
@@ -29,7 +30,10 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
 
   const fetchData = async () => {
     try {
-      // Fetch favourites and tags data
+      const userLikesTheseRAW = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+      const userLikesTheseeee = await userLikesTheseRAW.json();
+      console.log(userLikesTheseeee);
+      setUserLikesThese(userLikesTheseeee);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -65,7 +69,7 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
                     imageUrl={flashcardSet.coverImage}
                     description={flashcardSet.description}
                     buttonText="Play"
-                    favourite={favourites.includes(flashcardSet.flashcardSetID)}
+                    favourite={userLikesThese.some((elm: any) => elm != null && elm != undefined && elm.flashcardSetID == flashcardSet.flashcardSetID)}
                   />
                 </div>
               ))}
