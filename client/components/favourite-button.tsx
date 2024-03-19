@@ -90,7 +90,7 @@ function FavouriteButton({
       <button onClick={handleToggleFavorite}>
         <HeartIcon isActive={active} />
       </button>
-      <p className="ml-1">{(idToLikeMapper.get(flashcardSetID) || 0) + addLikeCount}</p>
+      <p className="ml-1 text-base">{(idToLikeMapper.get(flashcardSetID) || 0) + addLikeCount}</p>
     </div>
   );
 }

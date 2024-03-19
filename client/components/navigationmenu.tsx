@@ -64,46 +64,19 @@ export function NavigationMenuDemo() {
   return (
     <NavigationMenu className="ml-5">
       <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Play with flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={`z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
-            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[350px] lg:grid-cols-[.75fr_1fr]">
-              <NextLink href="allSets">
-              <ListItem href="/docs/primitives/typography" title="routine resistor">
-                View all sets
-              </ListItem>
-              </NextLink>
-              <NextLink href="filterSets">
-                <ListItem title="stability stalwart">
-                  Filters and searching
-                </ListItem>
-              </NextLink>
-              <NextLink href='displayFlashcardSet'>
-                <ListItem title="daredevil" onClick={() => setSet('stock')}>
-                  Randomized sets
-                </ListItem>
-              </NextLink>
-              <NextLink href='favourites'>
-                <ListItem title="me-centric master">
-                  Your favourite sets
-                </ListItem>
-              </NextLink>
-            </ul>
-          </NavigationMenuContent>
+      <NavigationMenuItem>
+          <Link href="/filterSets" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Play with flashcards
+            </NavigationMenuLink>
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Create flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={theme === 'light' ? 'bg-white' : 'bg-black'}>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {components.map((component) => (
-                <NextLink key={component.title} href={component.href}>
-                  <ListItem title={component.title} href={component.href}>
-                    {component.description}
-                  </ListItem>
-                </NextLink>
-              ))}
-            </ul>
-          </NavigationMenuContent>
+          <Link href="/createflashcards" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Create flashcards
+            </NavigationMenuLink>
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link href="/docs" legacyBehavior passHref>
