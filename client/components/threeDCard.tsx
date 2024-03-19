@@ -57,15 +57,25 @@ export function ThreeDCardDemo({
   const { setIdOfSetToEdit } = editTheSet();
   const [numerOfLikes, setNumberOfLikes] = useState<number>(0);
   const { sett, setSett } = changeChosenSet();
+  const [fav, setFav] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsAdmin(localStorage.getItem('admin') === 'true');
-    setProfileImageURLZustand(localStorage.getItem('profilePictureURL'));
-    console.log(sett);
-    const numLikes = sett.find((item) => item.flashcardSetID == id).numberOfLikes;
-    console.log(numLikes);
-    setNumberOfLikes(numLikes)
-  }, [])
+    const fetchData = async () => {
+      setIsAdmin(localStorage.getItem('admin') === 'true');
+      setProfileImageURLZustand(localStorage.getItem('profilePictureURL'));
+      const userLikesTheseRAW = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+      const userLikesThese = await userLikesTheseRAW.json();
+      console.log(userLikesThese);
+      const doesUserLikeThis = userLikesThese.includes(id);
+      setFav(doesUserLikeThis);
+      const numLikes = sett.find((item) => item.flashcardSetID == id).numberOfLikes;
+      console.log(numLikes);
+      setNumberOfLikes(numLikes);
+    };
+  
+    fetchData(); // Call the async function immediately
+  }, []);
+  
 
   const handleDelete = async () => {
     try {
@@ -96,7 +106,7 @@ export function ThreeDCardDemo({
           numberOfLikes={numerOfLikes}
           setNumberOfLikes={setNumberOfLikes}
           flashcardSetID={id}
-          isFavorite={favourite}
+          isFavorite={fav}
           userID={user?.uid}
         ></FavouriteButton>
         {user?.uid == creatorID || isAdmin ? (

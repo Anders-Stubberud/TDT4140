@@ -31,8 +31,12 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
       const userID = localStorage.getItem('userID');
       const response = await fetch(`${serverEndpoint}/api/getFavourites/${userID}`);
       const data = await response.json();
+      console.log(data);
       const favs: string[] = [];
       for (let i=0; i < Object.keys(data).length; i++) {
+        if (!data[i]) {
+          continue;
+        }
         favs.push(data[i].flashcardSetID)
       } 
       setFavourites(favs);

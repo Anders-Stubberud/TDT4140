@@ -174,13 +174,13 @@ const fetchFlashcardSetsBySearch = async(searchTerm) => {
 }
 
 const deleteSet = async (flashcardSetID) => {
-    const q = query(collection(db, userCollection), where("favourites", "array-contains", flashcardSetID));
+    // const q = query(collection(db, userCollection), where("favourites", "array-contains", flashcardSetID));
     try {
-        const querySnapshot = await getDocs(q);
-        for (const doc of querySnapshot.docs) {
-            const user = doc.data();
-            await removeFavourite(user.userID, flashcardSetID);
-        }
+        // const querySnapshot = await getDocs(q);
+        // for (const doc of querySnapshot.docs) {
+        //     const user = doc.data();
+        //     await removeFavourite(user.userID, flashcardSetID);
+        // }
 
         await deleteDoc(doc(db, flashcardSetCollection, flashcardSetID));
     } catch (error) {
