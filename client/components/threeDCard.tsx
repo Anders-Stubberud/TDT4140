@@ -9,6 +9,7 @@ import NextLink from "next/link";
 import FavouriteButton from "./favourite-button";
 import { TrashCanIcon } from "@/icons/trashcan";
 import EditIcon from "@/icons/editIcon";
+import CommentIcon from "@/icons/commentIcon";
 import { getAuth } from "firebase/auth";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Button } from "@nextui-org/button";
@@ -28,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import CommentSection from "./commentSection";
 interface ThreeDCardProps {
   title: string;
   description: string;
@@ -36,6 +38,7 @@ interface ThreeDCardProps {
   id: string;
   creatorID: string;
   favourite: boolean;
+  comments: any;
 }
 
 export function ThreeDCardDemo({
@@ -46,6 +49,7 @@ export function ThreeDCardDemo({
   id,
   creatorID,
   favourite,
+  comments, 
 }: ThreeDCardProps) {
   const { setname, setSet } = toggleSet();
   const { setIsLoggedIn } = zustand();
@@ -99,16 +103,26 @@ export function ThreeDCardDemo({
     router.push('createflashcards');
   }
 
+  const handleComments = () => {
+
+  }
+
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[20rem] h-auto rounded-xl p-6 border  ">
-        <FavouriteButton
-          numberOfLikes={numerOfLikes}
-          setNumberOfLikes={setNumberOfLikes}
-          flashcardSetID={id}
-          isFavorite={fav}
-          userID={user?.uid}
-        ></FavouriteButton>
+        <div className="flex flex-row items-center">
+          <FavouriteButton
+            numberOfLikes={numerOfLikes}
+            setNumberOfLikes={setNumberOfLikes}
+            flashcardSetID={id}
+            isFavorite={fav}
+            userID={user?.uid}
+          ></FavouriteButton>
+          <CommentSection
+          setID={id}
+          comments={comments}
+          ></CommentSection>
+        </div>
         {user?.uid == creatorID || isAdmin ? (
           <div className="absolute top-5 right-5 flex flex-row">
             <button className="mr-4" onClick={() => handleEditSet()}>

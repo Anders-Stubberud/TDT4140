@@ -34,7 +34,7 @@ const cloudStorage = new Storage({
 });
 const bucketName = "gs://flashy-3a502.appspot.com";
 const bucket = cloudStorage.bucket(bucketName);
-const {db, uploadData, fetchData, getTags, increaseLikeCount, sendTag, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
+const {db, uploadData, fetchData, addComment, getTags, increaseLikeCount, sendTag, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 const { getStorage, ref, uploadBytes } = 'firebase/storage';
 app.use(express.json());
@@ -182,6 +182,17 @@ app.post("/api/removeFavourite", async (req, res) => {
     }
 })
 
+app.post("/api/addComment", async (req, res) => {
+    try {
+        const { username, commentText, profileImageURL, setID } = req.body;
+        console.log(username, commentText, profileImageURL, setID)
+        await addComment(username, commentText, profileImageURL, setID)
+    } catch (e) {
+        res.status(500).send(dbFail)
+        console.log(e)
+    }
+})
+
 app.get("/api/userExists/:id", async (req, res) => {
     try {
         const userID = req.params.id;
@@ -281,6 +292,7 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
         });
 
         const uploadData = {
+            comments: [],
             creatorID: creatorID,
             numberOfLikes: parseInt(numberOfLikes),
             flashcardSetID: flashcardSetID,
@@ -296,7 +308,6 @@ app.post("/api/upload", mults.array("file"), async function (req, res, next) {
                 answerImage: idToURLMapper.has(`ANSWER-IMAGE${card.flashcardID}`) ? idToURLMapper.get(`ANSWER-IMAGE${card.flashcardID}`)[0] : newCardToURLMapper.hasOwnProperty(`answer-${card.flashcardID}`) ? newCardToURLMapper[`answer-${card.flashcardID}`] : null,
             }))
         }
-        console.log(uploadData);
         await uploadFlashcardSet(uploadData.flashcardSetID, uploadData);
         res.status(200).send(arr);
 

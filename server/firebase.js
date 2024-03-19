@@ -188,6 +188,16 @@ const deleteSet = async (flashcardSetID) => {
     }
 }
 
+const addComment = async(username, text, profileImageURL, setID) => {
+    await updateDoc(doc(db, flashcardSetCollection, setID), {
+        comments: arrayUnion({
+            username: username,
+            commentText: text,
+            profileImageURL: profileImageURL,
+        })
+    })
+}
+
 const fetchData = async (col, sub) => {
     try {
         const docRef = doc(db, col, sub);
@@ -231,5 +241,6 @@ module.exports = {
     editUserInformation,
     getTags,
     sendTag,
-    increaseLikeCount
+    increaseLikeCount,
+    addComment
 };

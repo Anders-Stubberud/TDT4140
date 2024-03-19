@@ -5,6 +5,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 // @ts-ignore
 import Heart from "react-heart";
 import { useFavouriteSets } from "@/state/zustand";
+import CommentIcon from "@/icons/commentIcon";
 
 interface FavouriteButtonProps {
   flashcardSetID: string;
@@ -74,7 +75,7 @@ function FavouriteButton({
   return (
     <div style={{ width: "1.3rem" }}>
       <Heart isActive={favourites.includes(flashcardSetID)} onClick={handleToggleFavorite} />
-      <p>{numberOfLikes}</p>
+      <p className="ml-1">{numberOfLikes}</p>
     </div>
   );
 }
