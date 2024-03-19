@@ -6,6 +6,8 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Heart from "react-heart";
 import { useFavouriteSets } from "@/state/zustand";
 import CommentIcon from "@/icons/commentIcon";
+import HeartIcon from "@/icons/heartIcon";
+import { act } from "@react-three/fiber";
 
 interface FavouriteButtonProps {
   flashcardSetID: string;
@@ -22,23 +24,25 @@ function FavouriteButton({
   numberOfLikes, 
   setNumberOfLikes
 }: FavouriteButtonProps) {
-  const [active, setActive] = useState(isFavorite);
 
   const { favourites, setFavourites } = useFavouriteSets();
+  const [active, setActive] = useState<boolean>(isFavorite);
 
   const handleToggleFavorite = async () => {
     try {
-      if (favourites.includes(flashcardSetID)) {
+      console.log('punch');
+      if (active) {
+        console.log('includes id');
         const response = await fetch(`${serverEndpoint}/api/increaseLikeCount/${flashcardSetID}/-1`);
         setNumberOfLikes(numberOfLikes - 1);
-        const newarr: string [] = [];
-        for (let i=0; i<favourites.length; i++) {
-          if (favourites[i] != flashcardSetID) {
-            newarr.push(favourites[i])
-          }
-        }
-        setFavourites(newarr);
-        setActive(!active);
+        // const newarr: string [] = [];
+        // for (let i=0; i<favourites.length; i++) {
+        //   if (favourites[i] != flashcardSetID) {
+        //     newarr.push(favourites[i])
+        //   }
+        // }
+        setFavourites(favourites.filter((fav: string) => fav != flashcardSetID));
+        setActive(false);
         // Remove from favorites
         await fetch(`${serverEndpoint}/api/removeFavourite`, {
           method: "POST",
@@ -51,10 +55,11 @@ function FavouriteButton({
           }),
         });
       } else {
+        console.log('not include');
         const response = await fetch(`${serverEndpoint}/api/increaseLikeCount/${flashcardSetID}/1`);
         setNumberOfLikes(numberOfLikes + 1);
         setFavourites([...favourites, flashcardSetID])
-        setActive(active);
+        setActive(true);
         // Add to favorites
         await fetch(`${serverEndpoint}/api/setFavourite`, {
           method: "POST",
@@ -74,7 +79,9 @@ function FavouriteButton({
 
   return (
     <div style={{ width: "1.3rem" }}>
-      <Heart isActive={favourites.includes(flashcardSetID)} onClick={handleToggleFavorite} />
+      <button onClick={handleToggleFavorite}>
+        <HeartIcon isActive={active} />
+      </button>
       <p className="ml-1">{numberOfLikes}</p>
     </div>
   );

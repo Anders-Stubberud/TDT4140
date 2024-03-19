@@ -48,6 +48,7 @@ export default function CommentSection({ comments, setID }: props) {
       .catch(error => {
         console.error('There was a problem with your fetch operation:', error);
       });
+      setCmt('');
   }
 
   return (
