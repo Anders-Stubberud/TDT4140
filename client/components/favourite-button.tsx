@@ -26,9 +26,13 @@ function FavouriteButton({
 }: FavouriteButtonProps) {
 
   const { favourites, setFavourites } = useFavouriteSets();
-  const [active, setActive] = useState<boolean>(isFavorite);
+  const [active, setActive] = useState<boolean>(false);
   const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
   const activeFromStart = isFavorite;
+
+  useEffect(() => {
+    setActive(isFavorite);
+  }, [isFavorite])
 
   const handleToggleFavorite = async () => {
     try {
@@ -86,7 +90,7 @@ function FavouriteButton({
       <button onClick={handleToggleFavorite}>
         <HeartIcon isActive={active} />
       </button>
-      <p className="ml-1">{idToLikeMapper.get(flashcardSetID)}</p>
+      <p className="ml-1">{(idToLikeMapper.get(flashcardSetID) || 0) + addLikeCount}</p>
     </div>
   );
 }

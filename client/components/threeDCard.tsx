@@ -72,7 +72,8 @@ export function ThreeDCardDemo({
       const userLikesTheseRAW = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
       const userLikesThese = await userLikesTheseRAW.json();
       console.log(userLikesThese);
-      const doesUserLikeThis = userLikesThese.includes(id);
+      const doesUserLikeThis = userLikesThese.some((elm: any) => elm != null && elm != undefined && elm.flashcardSetID == id);
+      console.log(id, doesUserLikeThis)
       setFav(doesUserLikeThis);
       const numLikes = sett.find((item) => item.flashcardSetID == id).numberOfLikes;
       console.log(numLikes);
