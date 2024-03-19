@@ -25,6 +25,7 @@ import { NavigationMenuDemo } from "./navigationmenu";
 import { zustand } from "../state/zustand";
 import { getAuth } from "firebase/auth";
 import { useTheme } from "next-themes";
+import { useUserStore } from "../state/zustand";
 
 export function SheetDemo() {
 
@@ -34,6 +35,7 @@ export function SheetDemo() {
     const auth = getAuth();
     const [user] = useAuthState(auth);
     const { theme, setTheme } = useTheme();
+    const { isAdmin } = useUserStore();
 
     const logOut = () => {
         signOut(auth)
@@ -55,13 +57,17 @@ export function SheetDemo() {
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
-          <DropdownMenuItem onClick={() => router.push('/profile')}>
-            <button className="text-m">
-              Administer users
-            </button>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          { isAdmin &&
+          <div>
+              <DropdownMenuItem onClick={() => router.push('/adminPage')}>
+              <button className="text-m">
+                Administer users
+              </button>
+              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          </div>
+          }
           <DropdownMenuItem> 
             <button onClick={() => logOut()}>
               Log out

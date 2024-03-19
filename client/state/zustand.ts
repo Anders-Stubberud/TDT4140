@@ -35,6 +35,8 @@ interface userLoggedIn {
     username: string | null
     profileImageURL: string | null
     isAdmin: boolean
+    isBanned: boolean
+    setIsBanned: (newBanned: boolean) => void
     setIsAdmin: (newAdminStatus: boolean) => void
     setProfileImageURLZustand: (profileImageURL: string | null) => void
     setUserNameZustand: (username: string) => void
@@ -46,6 +48,8 @@ export const useUserStore = create<userLoggedIn>()((set) => ({
     username: null,
     profileImageURL: null,
     isAdmin: false,
+    isBanned: false,
+    setIsBanned: (newBanned: boolean) => set({ isBanned: newBanned }),
     setIsAdmin: (newAdminStatus: boolean) => set({ isAdmin: newAdminStatus }),
     setProfileImageURLZustand: (newProfileImageURL: string | null) => set({ profileImageURL: newProfileImageURL }),
     setUserNameZustand: (newUserName: string | null) => set({ username: newUserName }),

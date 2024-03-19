@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
   const { username, profileImageURL } = useUserStore(); 
   const [userName, setUserNameLocal] = useState<string>("");
-  const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand } = useUserStore();
+  const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, isAdmin } = useUserStore();
   const [profilePicURL, setProfilePicURL] = useState<string | null>(profileImageURL);
 	const [ profilePic, setProfilePic ] = useState<File | null>(null);
   const fileInputRef = useRef(null);

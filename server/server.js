@@ -34,7 +34,7 @@ const cloudStorage = new Storage({
 });
 const bucketName = "gs://flashy-3a502.appspot.com";
 const bucket = cloudStorage.bucket(bucketName);
-const {db, uploadData, fetchData, addComment, getTags, increaseLikeCount, sendTag, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
+const {db, uploadData, getAllUsers, updateUser, fetchData, addComment, getTags, increaseLikeCount, sendTag, editUserInformation, flashcards, uploadFlashcardSet, fetchFlashcardSet, deleteSet, updateSet, uploadUser, pushFavourite, removeFavourite, fetchFavourites, fetchUser, fetchFlashcardSetsBySearch } = require('./firebase.js')
 const { doc, setDoc, getDoc, collection } = require("firebase/firestore"); 
 const { getStorage, ref, uploadBytes } = 'firebase/storage';
 app.use(express.json());
@@ -205,6 +205,16 @@ app.get("/api/userExists/:id", async (req, res) => {
     }
 });
 
+app.get("/api/getAllUsers", async (req, res) => {
+    try {
+        const users = await getAllUsers();
+        res.send(users);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.post('/api/setupUser', async (req, res) => {
     const { userID } = req.body
     const user = req.body
@@ -222,16 +232,9 @@ app.post('/api/setupUser', async (req, res) => {
     }
 })
 
-app.post('/api/editUser', async (req, res) => {
-    const { data } = req.body;
-    const dat = req.body;
-    // const user = req.body;
-    // const { uid } = req.body
-    // const userData = fetchData("user", uid)
-    // const name = userData['name'];
-    // const sets = userData['sets'];
-    // const favourites = userData['favourites'];
-    // user = new User(name, uid, sets, favourites);
+app.post('/api/updateUser', async (req, res) => {
+    const { userID, data } = req.body;
+    await updateUser(userID, data);
     res.status(200).send(arr)
 })
 

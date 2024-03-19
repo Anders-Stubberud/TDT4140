@@ -16,11 +16,12 @@ import { twMerge } from "tailwind-merge";
 export default function WelcomePage() {
 
 	const { setIsLoggedIn } = zustand();
-	const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, setIsAdmin } = useUserStore();
+	const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, setIsAdmin, setIsBanned } = useUserStore();
 	const auth = getAuth();
 	const [user] = useAuthState(auth);
 	const apiURL = "http://localhost:5001/api";
 	const { tags, setTags } = tagsAvailable();
+	let userIsBanned = false;
 
 	const url = 'https://random-words5.p.rapidapi.com/getRandom';
 	const options = {
@@ -136,7 +137,8 @@ export default function WelcomePage() {
 					  userName: `${resultRandomUsername}-${resultRandomUsername2}`,
 					  favourites: [],
 					  profilePictureURL: null,
-					  admin: false
+					  admin: false,
+					  isBanned: false
 					}),
 				  	});
 				  if (setupResponse.ok) {
@@ -153,6 +155,8 @@ export default function WelcomePage() {
 				const res = await fetch(apiURL + `/getUserInformation/${user?.uid}`);
 				const data = await res.json();
 				setIsAdmin(data.admin);
+				userIsBanned = data.isBanned;
+				setIsBanned(userIsBanned)
 				const taggiesRAW = await fetch(`${apiURL}/getTags`);
 				const taggies = await taggiesRAW.json();
 				const tagsArr = taggies.tagsArr;
@@ -174,6 +178,12 @@ export default function WelcomePage() {
 		fetchData();
 	  }, [user]);
 	  
+	if (userIsBanned) {
+		<div>
+		<h1>403 Forbidden</h1>
+		<img src="https://media.giphy.com/media/e3WNjAUKGNGoM/giphy.gif" alt="Forbidden" />
+	  </div>
+	}
 
 	return (
 		<TracingBeam className="px-6">

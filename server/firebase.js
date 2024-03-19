@@ -109,6 +109,11 @@ const pushFavourite = async (userID, flashcardSetID) => {
     })
 }
 
+const updateUser = async (userID, data) => {
+    console.log(data);
+    await updateDoc(doc(db, userCollection, userID), data);
+}
+
 const removeFavourite = async (userID, flashcardSetID) => {
     const userRef = doc(db, userCollection, userID);
         if (!userRef) {
@@ -188,6 +193,23 @@ const deleteSet = async (flashcardSetID) => {
     }
 }
 
+const getAllUsers = async () => {
+    const q = collection(db, userCollection);
+    const usersArray = [];
+
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            const user = doc.data();
+            usersArray.push(user);
+        });
+        return usersArray;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+};
+
 const addComment = async(username, text, profileImageURL, setID) => {
     await updateDoc(doc(db, flashcardSetCollection, setID), {
         comments: arrayUnion({
@@ -242,5 +264,7 @@ module.exports = {
     getTags,
     sendTag,
     increaseLikeCount,
-    addComment
+    addComment,
+    getAllUsers,
+    updateUser
 };
