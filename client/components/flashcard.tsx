@@ -149,8 +149,27 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
     router.push("/allSets");
   };
 
+  function shuffleArray(array: Flashcard []) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+  
+  function shuffleRemainingItems(array: Flashcard [], currentIndex: number) {
+    const beforeIndex = array.slice(0, currentIndex);
+    const afterIndex = array.slice(currentIndex);
+    const shuffledAfterIndex = shuffleArray(afterIndex);
+    const shuffledArray = beforeIndex.concat(shuffledAfterIndex);
+  
+    return shuffledArray;
+  }
+
   const shuffleCards = () => {
-    setCards(randomizeFlashcards());
+    // setCards(randomizeFlashcards());
+    const shuffledCards = shuffleRemainingItems(cards, currentCardIndex);
+    setCards(shuffledCards);
   };
 
   useEffect(() => {
