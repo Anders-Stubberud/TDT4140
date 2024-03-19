@@ -6,7 +6,6 @@ import { MultiStepLoaderDemo } from "@/components/multisteploader";
 export default function BlogPage() {
   return (
     <div>
-      <MultiStepLoaderDemo></MultiStepLoaderDemo>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function AboutPage() {
 	const [users, setUsers] = useState<any []>([]);
 
 	const { isAdmin } = useUserStore();
-	if (! isAdmin) {
+	if ((! isAdmin) && (! localStorage.getItem('admin'))) {
 		return (
 			<div>
 				<h1>403 Forbidden</h1>
@@ -107,54 +107,59 @@ export default function AboutPage() {
 	}
 
 	return (
-		<ScrollArea style={{ height: '600px' }}> {/* Adjust the height as needed */}
-		<div style={{ padding: '15px 20px' }}>
-		  {users.map((user) => (
-			<div key={user} className="mb-2">
-			  <Card className="max-w-[400px]">
-				<CardHeader className="flex gap-3">
-				  <Image
-					alt="nextui logo"
-					radius="sm"
-					src={user.profilePictureURL ? user.profilePictureURL : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/510px-Default_pfp.svg.png'}
-					width={user.profilePictureURL ? 200 : 100}
-				  />
-				  <div className="flex flex-col">
-					<p className="text-lg font-bold">{user.userName}</p>
-				  </div>
-				</CardHeader>
-				<Divider />
-				<CardBody>
-					{
-					user.banned ? 
-					<Button onClick={() => unBanUser(user.userID)} fullWidth className="ml-2" color="warning" variant="bordered" startContent={<UserIcon></UserIcon>}>
-						Unban user
-					</Button>
-					:
-					!user.admin ?
-					<div className="flex">
-						<Button onClick={() => makeAdmin(user.userID)} fullWidth color="success" variant="bordered" className="mr-2" startContent={<AdminIcon/>}>
-							Make admin
-						</Button>  
-						<Button onClick={() => banUser(user.userID)} fullWidth className="ml-2" color="danger" variant="bordered" startContent={<UserIcon></UserIcon>}>
-							Ban user
-						</Button>
+		<div>
+			<h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+              Adminpage
+            </h2>
+			<ScrollArea style={{ height: '600px' }}> {/* Adjust the height as needed */}
+			<div style={{ padding: '15px 20px' }}>
+			{users.map((user) => (
+				<div key={user} className="mb-2">
+				<Card className="max-w-[400px]">
+					<CardHeader className="flex gap-3">
+					<Image
+						alt="nextui logo"
+						radius="sm"
+						src={user.profilePictureURL ? user.profilePictureURL : 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/510px-Default_pfp.svg.png'}
+						width={user.profilePictureURL ? 200 : 100}
+					/>
+					<div className="flex flex-col">
+						<p className="text-lg font-bold">{user.userName}</p>
 					</div>
-					:
-					<Chip
-						startContent={<AdminIcon/>}
-						variant="solid"
-						color="success"
-					>
-						Admin
-					</Chip>
-					}
-				</CardBody>
-			  </Card>
+					</CardHeader>
+					<Divider />
+					<CardBody>
+						{
+						user.banned ? 
+						<Button onClick={() => unBanUser(user.userID)} fullWidth className="ml-2" color="warning" variant="bordered" startContent={<UserIcon></UserIcon>}>
+							Unban user
+						</Button>
+						:
+						!user.admin ?
+						<div className="flex">
+							<Button onClick={() => makeAdmin(user.userID)} fullWidth color="success" variant="bordered" className="mr-2" startContent={<AdminIcon/>}>
+								Make admin
+							</Button>  
+							<Button onClick={() => banUser(user.userID)} fullWidth className="ml-2" color="danger" variant="bordered" startContent={<UserIcon></UserIcon>}>
+								Ban user
+							</Button>
+						</div>
+						:
+						<Chip
+							startContent={<AdminIcon/>}
+							variant="solid"
+							color="success"
+						>
+							Admin
+						</Chip>
+						}
+					</CardBody>
+				</Card>
+				</div>
+			))}
 			</div>
-		  ))}
-		</div>
-	  </ScrollArea>
+		</ScrollArea>
+	  </div>
 	);
 
 }

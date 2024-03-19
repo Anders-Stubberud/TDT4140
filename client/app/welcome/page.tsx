@@ -3,7 +3,7 @@
 import { title } from "@/components/primitives";
 
 import { getAuth } from "firebase/auth";
-import { useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { zustand, useUserStore, user, tagsAvailable } from "../../state/zustand";
 import firebase from "firebase/compat/app";
@@ -12,6 +12,11 @@ import "firebaseui/dist/firebaseui.css";
 import { TracingBeam } from "../../components/ui/sticky-scroll-reveal";
 import Image from "next/image";
 import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/navigation";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../firebase";
+import { Logo } from "@/components/icons";
+import { signOut } from "firebase/auth";
 
 export default function WelcomePage() {
 
@@ -21,7 +26,15 @@ export default function WelcomePage() {
 	const [user] = useAuthState(auth);
 	const apiURL = "http://localhost:5001/api";
 	const { tags, setTags } = tagsAvailable();
-	let userIsBanned = false;
+	const [userIsBanned, setUserIsBanned] =useState();
+	const router = useRouter();
+
+    const app = initializeApp(firebaseConfig);
+
+    const logOut = () => {
+        signOut(auth)
+        localStorage.removeItem('userID')
+    }
 
 	const url = 'https://random-words5.p.rapidapi.com/getRandom';
 	const options = {
@@ -155,8 +168,9 @@ export default function WelcomePage() {
 				const res = await fetch(apiURL + `/getUserInformation/${user?.uid}`);
 				const data = await res.json();
 				setIsAdmin(data.admin);
-				userIsBanned = data.isBanned;
-				setIsBanned(userIsBanned)
+				const ban = data.banned;
+				console.log(ban);
+				setUserIsBanned(ban);
 				const taggiesRAW = await fetch(`${apiURL}/getTags`);
 				const taggies = await taggiesRAW.json();
 				const tagsArr = taggies.tagsArr;
@@ -177,43 +191,42 @@ export default function WelcomePage() {
 		};
 		fetchData();
 	  }, [user]);
-	  
-	if (userIsBanned) {
-		<div>
-		<h1>403 Forbidden</h1>
-		<img src="https://media.giphy.com/media/e3WNjAUKGNGoM/giphy.gif" alt="Forbidden" />
-	  </div>
-	}
 
-	return (
-		<TracingBeam className="px-6">
-		<div className="max-w-2xl mx-auto antialiased pt-4 relative">
-		  {dummyContent.map((item, index) => (
-			<div key={`content-${index}`} className="mb-10">
-			  <h2 className="bg-black text-white rounded-full text-sm w-fit px-4 py-1 mb-4">
-				{item.badge}
-			  </h2>
-   
-			  <p className={`${"font-calsans"} text-xl mb-4`}>
-				{item.title}
-			  </p>
-				
-			  <div className="text-sm  prose prose-sm dark:prose-invert">
-				{item?.image && (
-				  <Image
-				  	loading="eager"
-					src={item.image}
-					alt="blog thumbnail"
-					height="1000"
-					width="1000"
-					className="rounded-lg mb-10 object-cover"
-				  />
-				)}
-				{item.description}
+	  if (userIsBanned) {
+		logOut();
+		router.push('banned')
+	  }
+
+	  return (
+			<TracingBeam className="px-6">
+			  <div className="max-w-2xl mx-auto antialiased pt-4 relative">
+				{dummyContent.map((item, index) => (
+				  <div key={`content-${index}`} className="mb-10">
+					<h2 className="bg-black text-white rounded-full text-sm w-fit px-4 py-1 mb-4">
+					  {item.badge}
+					</h2>
+		 
+					<p className={`${"font-calsans"} text-xl mb-4`}>
+					  {item.title}
+					</p>
+					  
+					<div className="text-sm  prose prose-sm dark:prose-invert">
+					  {item?.image && (
+						<Image
+						  loading="eager"
+						  src={item.image}
+						  alt="blog thumbnail"
+						  height="1000"
+						  width="1000"
+						  className="rounded-lg mb-10 object-cover"
+						/>
+					  )}
+					  {item.description}
+					</div>
+				  </div>
+				))}
 			  </div>
-			</div>
-		  ))}
-		</div>
-	  </TracingBeam>
-	);
+			</TracingBeam>
+	  );
+	  
 }
