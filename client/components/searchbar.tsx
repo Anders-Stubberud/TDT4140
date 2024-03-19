@@ -3,6 +3,7 @@ import { Input, Button, Select, SelectItem } from "@nextui-org/react";
 import { serverEndpoint, flashcardSet, tagsAvailable, idToLikeStore } from "@/state/zustand";
 import { changeChosenSet } from "@/state/zustand";
 import SortIcon from "@/icons/sortIcon";
+import {Checkbox} from "@nextui-org/react";
 
 export default function SearchBar({ setData, setNum, setIsLoading, data }: any ) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,11 +45,16 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         console.log(err);
       }
     } else {
-      const filteredData: any[] = sett.filter((value: any) =>
+      let filteredData: any[] = sett.filter((value: any) =>
       value.setTitle.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
       isSubset(selectedItems.filter(str => str !== ''), value.tags)
-    );
-     
+      );
+      if (isSelected) {
+        const response = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+        const result = await response.json();
+        const favSets = result.filter((val: any) => val != null && val != undefined).map((set: any) => set.flashcardSetID);
+        filteredData = filteredData.filter((set) => favSets.includes(set.flashcardSetID));
+      }
       if (selectedItemsSort.length == 0) {
         setData(filteredData);
         setNum(Math.ceil(filteredData.length / 3))
@@ -76,6 +82,12 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
       }
     }
   };
+
+  const [isSelected, setIsSelected] = useState(false);
+
+  useEffect(() => {
+    handleSearch();
+  }, [isSelected])
 
   const [selectedItems, setSelectedItems] = useState<string []>([]); //tags
 
@@ -112,18 +124,23 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm, selectedItems, selectedItemsSort]);   
+  }, [searchTerm, selectedItems, selectedItemsSort]); 
 
   return (
     <div className="flex justify-between px-14">
 
-      <Input
-        placeholder="Search for set"
-        variant="bordered"
-        className="w-80"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      <div>
+        <Input
+          placeholder="Search for set"
+          variant="bordered"
+          className="w-80"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <Checkbox className="mt-1" isSelected={isSelected} onValueChange={setIsSelected}>
+          Show favourites only
+        </Checkbox>
+      </div>
 
       <Select
         label="Tags"
@@ -157,5 +174,5 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
       </Select>
 
     </div>
-);
+  );
 }

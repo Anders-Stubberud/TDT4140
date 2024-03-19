@@ -30,6 +30,7 @@ export default function AboutPage() {
 	const fetchUsers = async () => {
 		const response = await fetch(`${serverEndpoint}/api/getAllUsers`);
 		const data = await response.json();
+		console.log(data);
 		setUsers(data);
 	}
 

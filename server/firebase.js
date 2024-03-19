@@ -110,6 +110,7 @@ const pushFavourite = async (userID, flashcardSetID) => {
 }
 
 const updateUser = async (userID, data) => {
+    console.log(userID);
     console.log(data);
     await updateDoc(doc(db, userCollection, userID), data);
 }

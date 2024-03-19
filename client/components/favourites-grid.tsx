@@ -124,7 +124,9 @@ const FavouritesGrid: React.FC = () => {
         const userIDZustand = localStorage.getItem('userID');
         const response = await fetch(`${serverEndpoint}/api/getFavourites/${userIDZustand}`);
         const result = await response.json();
-        const flashcardSets = JSONToFlashcardSet(result);
+        const favSets = result.filter((val: any) => val != null && val != undefined);
+        const flashcardSets = JSONToFlashcardSet(favSets);
+        console.log(flashcardSets);
         setData(flashcardSets);
         setNum(Math.ceil(flashcardSets.length / 3))
         setIsLoading(false);
