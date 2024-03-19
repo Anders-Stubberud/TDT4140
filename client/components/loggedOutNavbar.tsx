@@ -10,41 +10,24 @@ import {
   NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Kbd } from "@nextui-org/kbd";
-import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
-import { getAuth } from "firebase/auth";
-import { link as linkStyles } from "@nextui-org/theme";
-
-import { siteConfig } from "@/config/site";
 import NextLink from "next/link";
-import { SheetDemo } from "./sheet";
-import { useEffect } from "react";
-import { zustand } from "../state/zustand";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
   SearchIcon,
 } from "@/components/icons";
 import { Logo } from "@/components/icons";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "../firebase.js";
-import { signOut } from "firebase/auth";
-import { Bot } from "lucide-react";
-import { NavigationMenuDemo2 } from "./navigationmenu2";
-import { AvatarDemo } from "./avatar";
 import {Button} from "@nextui-org/react";
 import { useUserStore } from "../state/zustand";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export const LoggedOutNavbar = () => {
 
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const router = useRouter();
+  const [loading, SetLoading] = useState<boolean>(true);
 
   const searchInput = (
     <Input
@@ -67,8 +50,18 @@ export const LoggedOutNavbar = () => {
     />
   );
 
+  useEffect(() => {
+    SetLoading(false);
+  }, [])
+
+  if (loading) {
+    return (
+      <></>
+    );
+  }
+
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" className={`z-50 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+    <NextUINavbar maxWidth="xl" position="sticky" className={`z-50 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">

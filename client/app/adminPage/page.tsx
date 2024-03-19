@@ -132,9 +132,11 @@ export default function AboutPage() {
 					<CardBody>
 						{
 						user.banned ? 
-						<Button onClick={() => unBanUser(user.userID)} fullWidth className="ml-2" color="warning" variant="bordered" startContent={<UserIcon></UserIcon>}>
-							Unban user
-						</Button>
+						<div className="w-11/12 flex justify-center">
+							<Button onClick={() => unBanUser(user.userID)} fullWidth className="ml-2" color="warning" variant="bordered" startContent={<UserIcon></UserIcon>}>
+								Unban user
+							</Button>
+						</div>
 						:
 						!user.admin ?
 						<div className="flex">

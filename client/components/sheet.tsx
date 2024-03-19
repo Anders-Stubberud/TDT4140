@@ -39,6 +39,7 @@ export function SheetDemo() {
 
     const logOut = () => {
         signOut(auth)
+        router.push('/');
         localStorage.removeItem('userID')
     }
 
