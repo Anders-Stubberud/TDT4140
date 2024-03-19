@@ -188,3 +188,19 @@ export const editIndexing = create<indexing>()((set) => ({
     indexZustand: 0,
     setIndexZustand: (newIndex: number) => set({indexZustand: newIndex}),
 }))
+interface idToLike {
+    idToLikeMapper: Map<string, number>;
+    updateIdToLikeMapper: (key: string, value: number) => void;
+  }
+  
+  export const idToLikeStore = create<idToLike>((set) => ({
+    idToLikeMapper: new Map<string, number>(),
+    updateIdToLikeMapper: (key: string, value: number) => {
+      set((state) => {
+        const updatedMap = new Map(state.idToLikeMapper);
+        updatedMap.set(key, value);
+        return { idToLikeMapper: updatedMap };
+      });
+    },
+  }));
+

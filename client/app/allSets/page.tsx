@@ -7,6 +7,7 @@ import SearchBar from "@/components/searchbar";
 import FlashcardSetList from "@/components/flashcardSetList";
 import { useEffect, useState } from "react";
 import { changeChosenSet, flashcardSet, serverEndpoint } from "@/state/zustand";
+import { idToLikeStore } from "@/state/zustand";
 
 export default function allSetsPage() {
 
@@ -14,6 +15,7 @@ export default function allSetsPage() {
   const [num, setNum] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { sett, setSett } = changeChosenSet();
+  const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +33,7 @@ export default function allSetsPage() {
         }
   
         const receivedData = await response.json();
+        console.log(receivedData);
         setData(receivedData);
         setSett(receivedData);
         setNum(Math.ceil(receivedData.length / 3));

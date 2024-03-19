@@ -1,6 +1,6 @@
 "use client";
 
-import { serverEndpoint } from "@/state/zustand";
+import { idToLikeStore, serverEndpoint } from "@/state/zustand";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 // @ts-ignore
 import Heart from "react-heart";
@@ -27,6 +27,7 @@ function FavouriteButton({
 
   const { favourites, setFavourites } = useFavouriteSets();
   const [active, setActive] = useState<boolean>(isFavorite);
+  const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
 
   const handleToggleFavorite = async () => {
     try {
@@ -82,7 +83,7 @@ function FavouriteButton({
       <button onClick={handleToggleFavorite}>
         <HeartIcon isActive={active} />
       </button>
-      <p className="ml-1">{numberOfLikes}</p>
+      <p className="ml-1">{idToLikeMapper.get(flashcardSetID)}</p>
     </div>
   );
 }

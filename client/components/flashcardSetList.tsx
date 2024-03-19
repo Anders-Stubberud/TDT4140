@@ -29,22 +29,7 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
 
   const fetchData = async () => {
     try {
-      const userID = localStorage.getItem('userID');
-      const response = await fetch(`${serverEndpoint}/api/getFavourites/${userID}`);
-      const data = await response.json();
-      console.log(data);
-      const favs: string[] = [];
-      for (let i=0; i < Object.keys(data).length; i++) {
-        if (!data[i]) {
-          continue;
-        }
-        favs.push(data[i].flashcardSetID)
-      } 
-      setFavourites(favs);
-      const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
-      const taggies = await taggiesRAW.json();
-      const tagsArr = taggies.tagsArr;
-      setTags(tagsArr);
+      // Fetch favourites and tags data
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -54,14 +39,10 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
     fetchData(); // Trigger on render
   }, [sett]); // Empty dependency array means it runs once on mount
 
+  // Chunk the sorted array into groups of 3
   const flashcardSetsGroups = chunkArray(flashcardSets, 3);
-  const threeByThree = chunkArray(flashcardSetsGroups, 3);
 
-  // const comment = [{
-  //   profilePic: 'https://storage.googleapis.com/flashy-3a502.appspot.com/6231a67d-494f-46a5-9661-af382916cfe2.undefined?GoogleAccessId=firebase-adminsdk-j0zai%40flashy-3a502.iam.gserviceaccount.com&Expires=1713925400&Signature=PSX2dvCkuHXFtca7Siq3sdvpsZym5xEVzDTGWLlqUSAse4Td1b%2F4XNBQxf1RZcrPVy8%2FQvf3PpSIkEMFF5Fxc8ve7yF91sW7JAQFRvAb2ieNtkFuvBZ9bltoJQeZUhtdUYcJ1MEHActKSDSvcqPVZuZ9rweoMF8pu%2BVQP4xgUm9B%2Bo5a25qx0LpxhhNvJv9AB5iHcyqJ6X8LzPbGUjUbSbd9PRg%2BrTRV1%2BTOnBhZarCD54QDh5BEVHEkU8A1s6t1QCRc%2FDy2ezVW3bXk5eOTIwu2VupFbD9oH%2F3onttNGSKUtEssp9VLy4%2BM37lFB3nnNqHIAq6xc9pCyw9M2eTkFA%3D%3D',
-  //   commentText: 'testcomment',
-  //   username: 'gigachad'
-  // }]
+  const threeByThree = chunkArray(flashcardSetsGroups, 3);
 
   return (
     <div>
@@ -76,6 +57,7 @@ const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
               {row.map((flashcardSet: any, cardIndex: any) => (
                 <div key={cardIndex} className="ml-10 mr-10">
                   <ThreeDCardDemo
+                    numberOfLikes={flashcardSet.numberOfLikes}
                     comments={flashcardSet.comments}
                     id={flashcardSet.flashcardSetID}
                     creatorID={flashcardSet.creatorID}

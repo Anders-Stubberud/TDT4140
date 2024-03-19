@@ -39,6 +39,7 @@ interface ThreeDCardProps {
   creatorID: string;
   favourite: boolean;
   comments: any;
+  numberOfLikes: number
 }
 
 export function ThreeDCardDemo({
@@ -50,6 +51,7 @@ export function ThreeDCardDemo({
   creatorID,
   favourite,
   comments, 
+  numberOfLikes
 }: ThreeDCardProps) {
   const { setname, setSet } = toggleSet();
   const { setIsLoggedIn } = zustand();
@@ -59,7 +61,7 @@ export function ThreeDCardDemo({
   const { isAdmin, setIsAdmin, setProfileImageURLZustand } = useUserStore();
   const router = useRouter();
   const { setIdOfSetToEdit } = editTheSet();
-  const [numerOfLikes, setNumberOfLikes] = useState<number>(0);
+  const [numerOfLikes, setNumberOfLikes] = useState<number>(numberOfLikes);
   const { sett, setSett } = changeChosenSet();
   const [fav, setFav] = useState<boolean>(false);
 

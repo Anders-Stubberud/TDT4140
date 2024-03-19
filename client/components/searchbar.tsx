@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, SelectItem } from "@nextui-org/react";
-import { serverEndpoint, flashcardSet, tagsAvailable } from "@/state/zustand";
+import { serverEndpoint, flashcardSet, tagsAvailable, idToLikeStore } from "@/state/zustand";
 import { changeChosenSet } from "@/state/zustand";
 import SortIcon from "@/icons/sortIcon";
 
@@ -9,6 +9,7 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
   const [first, setFirst] = useState(true);
   const { sett, setSett } = changeChosenSet();
   const { tags, setTags } = tagsAvailable();
+  const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
 
   function isSubset(subset: string [], superset: string []) {
     return subset.every(item => superset.includes(item));
@@ -31,6 +32,10 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         }
     
         const receivedData = await response.json();
+        console.log(receivedData);
+        receivedData.forEach((element: any) => {
+          updateIdToLikeMapper(element.flashcardSetID, element.numberOfLikes )
+        });
         setData(receivedData);
         setSett(receivedData);
         setNum(Math.ceil(receivedData.length / 3))
@@ -58,9 +63,15 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         setIsLoading(false);
       }
       else if (selectedItemsSort[0] == 'Most popular') {
-        // after implementing number of likes onto the sets
-        setData(filteredData); // same as if no sorting
-        setNum(Math.ceil(filteredData.length / 3))
+        const sortedData = [...filteredData].sort((a, b) => {
+          console.log("Comparing:", a.numberOfLikes, b.numberOfLikes);
+          const result = b.numberOfLikes - a.numberOfLikes;
+          console.log("Result:", result);
+          return result;
+        });
+        console.log("Sorted Data:", sortedData);
+        setData(sortedData);
+        setNum(Math.ceil(sortedData.length / 3));
         setIsLoading(false);
       }
     }
