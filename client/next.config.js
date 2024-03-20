@@ -14,6 +14,9 @@ const nextConfig = {
     images: {
         domains: ['images.unsplash.com', 'source.unsplash.com', 'storage.googleapis.com', 'firebasestorage.googleapis.com'],
     },
+    devServer: {
+        quiet: true,
+      },
 
 }
 

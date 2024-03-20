@@ -6,29 +6,23 @@ import { Button } from "./ui/button";
 
 const loadingStates = [
   {
-    text: "Buying a condo",
+    text: "Extracting information...",
   },
   {
-    text: "Travelling in a flight",
+    text: "Sending data to server...",
   },
   {
-    text: "Meeting Tyler Durden",
+    text: "Inserting into database...",
   },
   {
-    text: "He makes soap",
+    text: "Validating...",
   },
   {
-    text: "We goto a bar",
+    text: "Flashcardset upload success!",
   },
   {
-    text: "Start a fight",
-  },
-  {
-    text: "We like it",
-  },
-  {
-    text: "Welcome to F**** C***",
-  },
+    text: "Group 40 rocks :)",
+  }
 ];
 
 interface AreaProps {
@@ -44,13 +38,13 @@ export function MultiStepLoaderDemo({clicked}: AreaProps) {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 6000);
   }
 
   return (
     <div className="flex items-center justify-center">
       {/* Core Loader Modal */}
-      <Loader loadingStates={loadingStates} loading={loading} duration={250} />
+      <Loader loadingStates={loadingStates} loading={loading} duration={1000} />
 
       <Button onClick={() => load()}>
         Create set

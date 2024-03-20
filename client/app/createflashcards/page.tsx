@@ -28,6 +28,7 @@ import axios from "axios";
 import {Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import {CheckboxGroup, Checkbox} from "@nextui-org/react";
 import { json } from "stream/consumers";
+import TrashCanIcon2 from "@/icons/trashcan2";
 
 export default function CreateflashcardsPage(navigationData: any) {
 
@@ -82,7 +83,9 @@ export default function CreateflashcardsPage(navigationData: any) {
           setDescription(description);
           const newCardFormArr = flashcards.map((value: any, index: number) => (
             <FlashcardForm 
-              handleAnswerImageChange={handleAnswerImageChange}
+            hasAnswerImage={cardInformation.some((value: any) => value.cardID == value.props.id && value.answerImage != null && value.answerImage != undefined)}
+            hasQuestionImage={cardInformation.some((value: any) => value.cardID == value.props.id && value.questionImage != null && value.questionImage != undefined)}      
+            handleAnswerImageChange={handleAnswerImageChange}
               handleQuestionImageChange={handleQuestionImageChange}
               handleAnswerChange={handleAnswerChange}
               handleQuestionChange={handleQuestionChange}
@@ -132,6 +135,8 @@ export default function CreateflashcardsPage(navigationData: any) {
     
         const newCardFormArr = fetchedQuestions.map((question, index) => (
           <FlashcardForm 
+          hasAnswerImage={false}
+          hasQuestionImage={false}
             handleAnswerImageChange={handleAnswerImageChange}
             handleQuestionImageChange={handleQuestionImageChange}
             handleAnswerChange={handleAnswerChange}
@@ -158,20 +163,24 @@ export default function CreateflashcardsPage(navigationData: any) {
   } 
 
   const handleAnswerChange = (id: string, answer: string) => {
+    console.log(answer);
     setCardInformation(cardInformation.map((card) =>
       card.cardID === id ? { ...card, cardAnswer: answer } : card
     ));
   } 
 
-  const handleAnswerImageChange = (id: string, answerImage: File) => {
+  const handleAnswerImageChange = (id: string, answerImage: File | undefined | null) => {
+    console.log(id);
     setCardInformation(cardInformation.map((card) =>
-      card.cardID === id ? { ...card, answerImage: answerImage } : card
+      card.cardID == id ? { ...card, answerImage: answerImage ? answerImage : null } : card
     ));
+    console.log(cardInformation);
   } 
 
-  const handleQuestionImageChange = (id: string, questionImage: File) => {
+  const handleQuestionImageChange = (id: string, questionImage: File | undefined | null) => {
+    console.log(questionImage);
     setCardInformation(cardInformation.map((card) =>
-      card.cardID === id ? { ...card, questionImage: questionImage } : card
+      card.cardID == id ? { ...card, questionImage: questionImage ? questionImage : null } : card
     ));
   } 
 
@@ -184,7 +193,7 @@ export default function CreateflashcardsPage(navigationData: any) {
       questionImage: null,
       answerImage: null
     }]);
-    setCardFormArr([...cardFormArr, <FlashcardForm handleAnswerImageChange={handleAnswerImageChange} handleQuestionImageChange={handleQuestionImageChange} handleAnswerChange={handleAnswerChange} handleQuestionChange={handleQuestionChange} id={ uuidID } defaultAnswer="" defaultQuestion="" remove={removeCard} key={uuidv4()} numberInLine={cardFormArr.length + 1} />]);
+    setCardFormArr([...cardFormArr, <FlashcardForm hasAnswerImage={false} hasQuestionImage={false} handleAnswerImageChange={handleAnswerImageChange} handleQuestionImageChange={handleQuestionImageChange} handleAnswerChange={handleAnswerChange} handleQuestionChange={handleQuestionChange} id={ uuidID } defaultAnswer="" defaultQuestion="" remove={removeCard} key={uuidv4()} numberInLine={cardFormArr.length + 1} />]);
   }
   
   const removeCard = (id: string) => {
@@ -356,14 +365,22 @@ export default function CreateflashcardsPage(navigationData: any) {
           <Divider orientation="vertical" className="mx-4"/>
           <div className="">
             <div className="flex">
+              <div className="flex">
+                <div className="">
+                <Checkbox color="success" isDisabled isSelected={coverImage != null && coverImage != undefined}></Checkbox>
+                <button onClick={() => setCoverImage(null)}>
+                <TrashCanIcon2></TrashCanIcon2>
+                </button>
+                </div>
               <Button
                 color="primary"
                 className="w-full mb-1"
                 endContent={<CameraIcon />}
                 onClick={handleButtonClick}
               >
-                Upload cover image
+                Cover image
               </Button>
+              </div>
               <Popover shouldCloseOnInteractOutside={handleOutsideDropdownClick} placement="bottom" showArrow offset={10} isOpen={isOpen}>
                 <PopoverTrigger>
                 <Button
@@ -435,6 +452,8 @@ export default function CreateflashcardsPage(navigationData: any) {
       </div>
       {cardFormArr.map((card, index) => (
         <FlashcardForm
+          hasAnswerImage={cardInformation.some((value: any) => value.cardID == card.props.id && value.answerImage != null && value.answerImage != undefined)}
+          hasQuestionImage={cardInformation.some((value: any) => value.cardID == card.props.id && value.questionImage != null && value.questionImage != undefined)}
           handleAnswerImageChange={ handleAnswerImageChange }
           handleQuestionImageChange={ handleQuestionImageChange }
           handleAnswerChange={handleAnswerChange}

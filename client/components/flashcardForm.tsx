@@ -1,4 +1,4 @@
-import {Button, Select, SelectItem} from "@nextui-org/react";
+import {Button, Checkbox, Select, SelectItem} from "@nextui-org/react";
 import {CameraIcon} from '../icons/cameraIcon';
 import * as Separator from '@radix-ui/react-separator';
 import {Divider} from "@nextui-org/react";
@@ -7,6 +7,7 @@ import {Input} from "@nextui-org/react";
 import { changeUserInfo } from "@/state/zustand";
 import { useEffect, useRef, useState } from "react";
 import { TrashCanIcon } from "@/icons/trashcan";
+import { TrashCanIcon2 } from "@/icons/trashcan2";
 
 interface AreaProps {
   numberInLine: number;
@@ -15,12 +16,14 @@ interface AreaProps {
   defaultAnswer: string;
   handleQuestionChange: (id: string, question: string) => void;
   handleAnswerChange: (id: string, answer: string) => void;
-  handleAnswerImageChange: (id: string, answerImage: File) => void;
-  handleQuestionImageChange: (id: string, questionImage: File) => void; 
+  handleAnswerImageChange: (id: string, answerImage: File | undefined | null) => void;
+  handleQuestionImageChange: (id: string, questionImage: File | undefined | null) => void; 
   remove: (id: string) => void;
+  hasQuestionImage: boolean;
+  hasAnswerImage: boolean;
 }
 
-export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChange, remove, defaultAnswer, defaultQuestion, id, numberInLine, handleAnswerChange, handleQuestionChange }: AreaProps) {
+export function FlashcardForm({ hasAnswerImage, hasQuestionImage, handleAnswerImageChange, handleQuestionImageChange, remove, defaultAnswer, defaultQuestion, id, numberInLine, handleAnswerChange, handleQuestionChange }: AreaProps) {
 
   const fileInputRefAnswer = useRef(null);
   const fileInputRefQuestion = useRef(null);
@@ -88,6 +91,12 @@ export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChan
             >
               <CameraIcon></CameraIcon>
             </Button>
+            <div className="flex flex-col">
+            <Checkbox color="success" isDisabled isSelected={hasQuestionImage}></Checkbox>
+            <button onClick={() => handleQuestionImageChange(id, null)}>
+                <TrashCanIcon2></TrashCanIcon2>
+            </button>
+            </div>
             <input
               type="file"
               ref={fileInputRefQuestion}
@@ -105,6 +114,12 @@ export function FlashcardForm({ handleAnswerImageChange, handleQuestionImageChan
             >
               <CameraIcon></CameraIcon>
             </Button>
+            <div className="flex flex-col">
+            <Checkbox color="success" isDisabled isSelected={hasAnswerImage}></Checkbox>
+            <button onClick={() => handleAnswerImageChange(id, null)}>
+                <TrashCanIcon2></TrashCanIcon2>
+            </button>
+            </div>
             <input
               type="file"
               ref={fileInputRefAnswer}
