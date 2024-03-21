@@ -1,5 +1,5 @@
 const { initializeApp } = require("firebase/app");
-const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc } = require('firebase/firestore')
+const { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, arrayUnion, arrayRemove, query, deleteDoc, where } = require('firebase/firestore')
 const { firebase } = require('firebase/app');
 
 const firebaseConfig = {
@@ -14,6 +14,8 @@ const firebaseConfig = {
 
 let app = initializeApp(firebaseConfig)
 let db = getFirestore(app);
+let flashcardSetCollection = "flashcardSets2"
+let userCollection = "users"
 
 const uploadData = async (col, sub, data) => {
     try {
@@ -26,7 +28,61 @@ const uploadData = async (col, sub, data) => {
 
 const uploadFlashcardSet = async (setId, data) => {
     try {
-        await setDoc(doc(db, "flashcardSets1", setId), data);
+        await setDoc(doc(db, flashcardSetCollection, setId), data);
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+const uploadUser = async (userID, data) => {
+    await setDoc(doc(db, userCollection, userID), data, { merge: true});
+}
+
+const editUserInformation = async (userID, data) => {
+    await updateDoc(doc(db, userCollection, userID), data)
+}
+
+const getTags = async () => {
+    const data = await fetchData('assorted', 'tags');
+    return data;
+} 
+
+const sendTag = async (tag) => {
+    const previous = await fetchData('assorted', 'tags');
+    const arr = previous.tagsArr;
+    const newArr = [...arr, tag];
+    await setDoc(doc(db, 'assorted', 'tags'), { tagsArr: newArr });
+}
+
+const increaseLikeCount = async (id, value) => {
+    const previous = await fetchFlashcardSet(id);
+    const previosuLikeCount = previous.numberOfLikes;
+    const newLikeCount = previosuLikeCount + value;
+    await updateDoc(doc(db, flashcardSetCollection, id), {
+        numberOfLikes: newLikeCount
+    })
+}
+
+const fetchUser = async (userID) => {
+    
+    const docSnap = await (getDoc(doc(db, userCollection, userID)))
+    
+    if (docSnap.exists()) {
+        return docSnap.data() //returns user
+    } else {
+        return null // user does not exist
+    }
+}
+
+/**
+ * Update a set with new information
+ * 
+ * @param {*} setId 
+ * @param {*} data 
+ */
+const updateSet = async (setId, data) => {
+    try {
+        await setDoc(doc(db, flashcardSetCollection, setId), data, { merge: true });
     } catch (e) {
         console.log(e)
     }
@@ -34,7 +90,7 @@ const uploadFlashcardSet = async (setId, data) => {
 
 const flashcards = async () => {
     try {
-        const collectionRef = collection(db, 'flashcardSets1');
+        const collectionRef = collection(db, flashcardSetCollection);
         const querySnapshot = await getDocs(collectionRef);
         const documents = querySnapshot.docs.map(doc => doc.data());
         return documents;
@@ -44,12 +100,127 @@ const flashcards = async () => {
 }
 
 const fetchFlashcardSet = async (id) => {
-    return fetchData("flashcardSets1", id);
+    return fetchData(flashcardSetCollection, id);
 }
 
-const deleteSet = async (id) => {
-    await deleteDoc(doc(db, "flashcardSets1", id));
+const pushFavourite = async (userID, flashcardSetID) => {
+    await updateDoc(doc(db, userCollection, userID), {
+        favourites: arrayUnion(flashcardSetID)
+    })
 }
+
+const updateUser = async (userID, data) => {
+    console.log(userID);
+    console.log(data);
+    await updateDoc(doc(db, userCollection, userID), data);
+}
+
+const removeFavourite = async (userID, flashcardSetID) => {
+    const userRef = doc(db, userCollection, userID);
+        if (!userRef) {
+            console.error("Invalid user reference");
+            return;
+        }
+
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            
+            if (userData && userData.favourites) {
+                const updatedFavourites = userData.favourites.filter(id => id !== flashcardSetID);
+
+                await updateDoc(userRef, {
+                    favourites: updatedFavourites
+                });
+            } else {
+                console.error("Favourites field is missing or null");
+            }
+        } else {
+            console.error("User document does not exist");
+        }
+}
+
+const fetchFavourites = async (userID) => {
+    const user = await fetchData(userCollection, userID);
+
+    const flashcardSets = [];
+    
+    if (!user) {
+        return flashcardSets;
+    }
+
+    const { favourites: favourites = [] } = user;
+
+    if (favourites.length === 0) {
+        return flashcardSets
+    }
+
+    for (const id of favourites) {
+        try {
+            const set = await fetchFlashcardSet(id);
+            flashcardSets.push(set);
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    return flashcardSets;
+};
+
+
+const fetchFlashcardSetsBySearch = async(searchTerm) => {
+
+    const data = await flashcards()
+    if (searchTerm.length === 0) {
+        return data
+    }
+    const matchedElements = data.filter(set => set.name && set.name.includes(searchTerm))
+    return matchedElements
+}
+
+const deleteSet = async (flashcardSetID) => {
+    // const q = query(collection(db, userCollection), where("favourites", "array-contains", flashcardSetID));
+    try {
+        // const querySnapshot = await getDocs(q);
+        // for (const doc of querySnapshot.docs) {
+        //     const user = doc.data();
+        //     await removeFavourite(user.userID, flashcardSetID);
+        // }
+
+        await deleteDoc(doc(db, flashcardSetCollection, flashcardSetID));
+    } catch (error) {
+        console.error("Error querying and removing flashcard set:", error);
+    }
+}
+
+const getAllUsers = async () => {
+    const q = collection(db, userCollection);
+    const usersArray = [];
+
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            const user = doc.data();
+            usersArray.push(user);
+        });
+        return usersArray;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+};
+
+const addComment = async(username, text, profileImageURL, setID) => {
+    await updateDoc(doc(db, flashcardSetCollection, setID), {
+        comments: arrayUnion({
+            username: username,
+            commentText: text,
+            profileImageURL: profileImageURL,
+        })
+    })
+}
+
 const fetchData = async (col, sub) => {
     try {
         const docRef = doc(db, col, sub);
@@ -66,24 +237,35 @@ const fetchData = async (col, sub) => {
     }
 }
 
+// const main = async (id) => {
+//     try {
+//         console.log(flashcards())
+//     } catch (e) {
+//         console.log(e)
+//     }
+//   };
+
+//   const data = main('AoQ73KqfcOeMbrdp6zs1s5Ux7IF2');
+
 module.exports = {
     uploadData,
     fetchData,
     flashcards,
     uploadFlashcardSet,
     fetchFlashcardSet,
-    deleteSet
+    deleteSet,
+    fetchFlashcardSetsBySearch,
+    updateSet,
+    uploadUser,
+    pushFavourite,
+    removeFavourite,
+    fetchFavourites,
+    fetchUser,
+    editUserInformation,
+    getTags,
+    sendTag,
+    increaseLikeCount,
+    addComment,
+    getAllUsers,
+    updateUser
 };
-
-
-const main = async () => {
-    try {
-        const collectionRef = collection(db, 'flashcardSets');
-        const querySnapshot = await getDocs(collectionRef);
-        const documents = querySnapshot.docs.map(doc => doc.data());
-    } catch (error) {
-        console.log(error)
-    }    
-};
-
-// main();

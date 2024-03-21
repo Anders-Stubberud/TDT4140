@@ -1,22 +1,91 @@
-import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
-import { flashcard, flashcardSet } from '@/state/zustand';
+import { Spinner } from "@nextui-org/react";
+import { flashcardSet, serverEndpoint, useFavouriteSets } from "@/state/zustand";
+import { useEffect, useState } from "react";
+import { ThreeDCardDemo } from "./threeDCard";
+import { PaginationDemo } from "./pagination";
+import { tagsAvailable, changeChosenSet } from "@/state/zustand";
 
 interface FlashcardSetListProps {
   flashcardSets: flashcardSet[];
+  number: number;
+  isLoading: boolean;
 }
 
-const FlashcardSetList: React.FC<FlashcardSetListProps> = ({ flashcardSets }) => {
-    return (
-        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-          {flashcardSets.map((flashcardSet, index) => (
-            <Card shadow="sm" key={index} isPressable onPress={() => console.log("item pressed")} className="p-6">
-              <CardBody className="overflow-visible p-0">
-                      <p>{flashcardSet.name}</p>
-              </CardBody>
-            </Card>
-            ))}
-        </div>
+const FlashcardSetList: React.FC<FlashcardSetListProps> = ({
+  flashcardSets,
+  number,
+  isLoading,
+}) => {
+  const [index, setIndex] = useState<number>(0);
+  const { favourites, setFavourites } = useFavouriteSets();
+  const { tags, setTags } = tagsAvailable();
+  const { sett } = changeChosenSet();
+  const [userLikesThese, setUserLikesThese] = useState<any []>([]);
+
+  const chunkArray = (array: any[], size: number) => {
+    return Array.from({ length: Math.ceil(array.length / size) }, (_, index) =>
+      array.slice(index * size, index * size + size)
     );
+  };
+
+  const fetchData = async () => {
+    try {
+      const userLikesTheseRAW = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+      const userLikesTheseeee = await userLikesTheseRAW.json();
+      console.log(userLikesTheseeee);
+      setUserLikesThese(userLikesTheseeee);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(); // Trigger on render
+  }, [sett]); // Empty dependency array means it runs once on mount
+
+  // Chunk the sorted array into groups of 3
+  const flashcardSetsGroups = chunkArray(flashcardSets, 3);
+
+  const threeByThree = chunkArray(flashcardSetsGroups, 3);
+
+  return (
+    <div>
+      {isLoading ? (
+        <div className="flex justify-center mt-10">
+          <Spinner />
+        </div>
+      ) : (
+        <div>
+          {threeByThree[index]?.map((row, rowIndex) => (
+            <div key={rowIndex} className="flex justify-center mt-4">
+              {row.map((flashcardSet: any, cardIndex: any) => (
+                <div key={cardIndex} className="ml-10 mr-10">
+                  <ThreeDCardDemo
+                    numberOfLikes={flashcardSet.numberOfLikes}
+                    comments={flashcardSet.comments}
+                    id={flashcardSet.flashcardSetID}
+                    creatorID={flashcardSet.creatorID}
+                    title={flashcardSet.setTitle}
+                    imageUrl={flashcardSet.coverImage}
+                    description={flashcardSet.description}
+                    buttonText="Play"
+                    favourite={userLikesThese.some((elm: any) => elm != null && elm != undefined && elm.flashcardSetID == flashcardSet.flashcardSetID)}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+          <div className="mt-10">
+            <PaginationDemo
+              number={threeByThree.length}
+              index={index}
+              setIndex={setIndex}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default FlashcardSetList;

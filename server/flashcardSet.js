@@ -34,6 +34,9 @@ class FlashcardSet {
             throw new Error("Not valid index for editing flashcard");
         }
     }
+   
+ 
 }
+
 exports.default = FlashcardSet;
 exports.FlashcardSet = FlashcardSet;

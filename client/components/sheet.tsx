@@ -1,72 +1,81 @@
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { AvatarDemo } from "./avatar"
-import NextLink from "next/link";
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { AvatarDemo } from "./avatar"
+import { useRouter } from 'next/navigation'
 import { useAuthState } from "react-firebase-hooks/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../firebase.js";
+import { Logo } from "@/components/icons";
 import { signOut } from "firebase/auth";
+import { Bot } from "lucide-react";
+import { NavigationMenuDemo } from "./navigationmenu";
+import { zustand } from "../state/zustand";
 import { getAuth } from "firebase/auth";
-
+import { useTheme } from "next-themes";
+import { useUserStore } from "../state/zustand";
 
 export function SheetDemo() {
 
+    const router = useRouter();
     const app = initializeApp(firebaseConfig);
+    const {setIsLoggedIn} = zustand();
     const auth = getAuth();
     const [user] = useAuthState(auth);
+    const { theme, setTheme } = useTheme();
+    const { isAdmin } = useUserStore();
 
-  return (
-        <Sheet>
-            <SheetTrigger asChild>
-                <Button variant="ghost">
-                    <AvatarDemo></AvatarDemo>
-                </Button>
-            </SheetTrigger>
-            <SheetContent>
-                <SheetHeader>
-                <SheetTitle>Edit profile</SheetTitle>
-                <SheetDescription>
-                    Make changes to your profile here. Click save when you're done.
-                </SheetDescription>
-                </SheetHeader>
-                <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                    Name
-                    </Label>
-                    <Input id="name" placeholder="Pedro Duarte" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                    Username
-                    </Label>
-                    <Input id="username" placeholder="@peduarte" className="col-span-3" />
-                </div>
-                </div>
-                <SheetFooter>
-                <SheetClose asChild>
-                    <Button type="submit">Save changes</Button>
-                </SheetClose>
-                </SheetFooter>
-                <div className="flex justify-center mt-64">
-                    <NextLink href='/'>
-                        <Button onClick={() => signOut(auth)} type="submit" className="mt-28 bg-red-700">
-                            Log out
-                        </Button>
-                    </NextLink>
-                </div>
-            </SheetContent>
-        </Sheet>
-  )
+    const logOut = () => {
+        router.push('/');
+        signOut(auth)
+        localStorage.removeItem('userID')
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost"><AvatarDemo></AvatarDemo></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className={`w-56 ${theme === 'light' ? 'bg-white' : 'bg-black'}`}>
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          <DropdownMenuItem onClick={() => router.push('/profile')}>
+            <button className="text-m">
+              Profile
+            </button>
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          { isAdmin &&
+          <div>
+              <DropdownMenuItem onClick={() => router.push('/adminPage')}>
+              <button className="text-m">
+                Administer users
+              </button>
+              <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="scroll-m-2 border-b pb-2 text-m font-semibold tracking-tight first:mt-0"/>
+          </div>
+          }
+          <DropdownMenuItem> 
+            <button onClick={() => logOut()}>
+              Log out
+            </button>
+            <DropdownMenuShortcut>⇧⌘R</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
 }

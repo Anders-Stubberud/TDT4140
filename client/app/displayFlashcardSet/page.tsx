@@ -6,7 +6,7 @@ export default function DisplayFlashCardSetPage() {
   return (
     <>
       <div className="flex justify-center items-center ">
-        <FlashCard></FlashCard>;
+        <FlashCard></FlashCard>
       </div>
     </>
   );

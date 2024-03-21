@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { toggleDarkMode } from "../state/zustand"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+// import { toggleDarkMode } from "../state/zustand";
+import { cn } from "@/lib/utils";
 // import { Icons } from "@/components/icons"
 import { useRouter } from "next/navigation";
 import NextLink from "next/link";
@@ -16,13 +16,14 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import { toggleSet } from "../state/zustand"
+import { useTheme } from "next-themes";
 
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Create flashcards",
     href: "/createflashcards",
-    description:
-      "Create yout own flashcards",
+    description: "Create yout own flashcards",
   },
   {
     title: "Hover Card",
@@ -53,56 +54,29 @@ const components: { title: string; href: string; description: string }[] = [
     description:
       "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
   },
-]
+];
 
 export function NavigationMenuDemo() {
-
-  const { dark } = toggleDarkMode();
   const router = useRouter();
+  const { setname, setSet } = toggleSet();
+  const { theme, setTheme } = useTheme();
 
   return (
     <NavigationMenu className="ml-5">
       <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>Play with flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={dark}>
-            <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[350px] lg:grid-cols-[.75fr_1fr]">
-              <NextLink href='allSets'>
-                <ListItem title="stability stalwart">
-                  Filters and searching
-                </ListItem>
-              </NextLink>
-              <NextLink href='displayFlashcardSet'>
-                <ListItem title="daredevil">
-                  Randomized sets
-                </ListItem>
-              </NextLink>
-              <ListItem href="/docs/primitives/typography" title="routine resistor">
-                View all sets
-              </ListItem>
-              <ListItem href="/docs/primitives/path" title="me-centric master">
-                Sets you've created
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
+      <NavigationMenuItem>
+          <Link href="/filterSets" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Play with flashcards
+            </NavigationMenuLink>
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Create flashcards</NavigationMenuTrigger>
-          <NavigationMenuContent className={dark}>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {components.map((component) => (
-                <NextLink href={component.href}>
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
-                </NextLink>
-              ))}
-            </ul>
-          </NavigationMenuContent>
+          <Link href="/createflashcards" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Create flashcards
+            </NavigationMenuLink>
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link href="/docs" legacyBehavior passHref>
@@ -113,7 +87,7 @@ export function NavigationMenuDemo() {
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
@@ -138,6 +112,6 @@ const ListItem = React.forwardRef<
         </a>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";
