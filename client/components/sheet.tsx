@@ -38,8 +38,8 @@ export function SheetDemo() {
     const { isAdmin } = useUserStore();
 
     const logOut = () => {
-        signOut(auth)
         router.push('/');
+        signOut(auth)
         localStorage.removeItem('userID')
     }
 
