@@ -94,16 +94,37 @@ export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
       if (currentCardIndex < cards.length - 1) {
         flashcardArrayRef.current?.nextCard();
         setIsFlipped(false);
+        setTimeout(() => {
         setCurrentCardIndex((prevIndex) =>
           Math.min(prevIndex + 1, cards.length - 1)
         );
         setDisplayedCardIndex(currentCardIndex);
+      }, 200);
       } else {
         setIsFinished(true);
         setIsExploding(true);
       }
     }, 130);
   };
+
+  // const goToNextCard = () => {
+  //   setTimeout(() => {
+  //     if (currentCardIndex < cards.length - 1) {
+  //       flashcardArrayRef.current?.nextCard();
+  //       setIsFlipped(false);
+
+
+
+  //       setCurrentCardIndex((prevIndex) =>
+  //         Math.min(prevIndex + 1, cards.length - 1)
+  //       );
+  //       setDisplayedCardIndex(currentCardIndex);
+  //     } else {
+  //       setIsFinished(true);
+  //       setIsExploding(true);
+  //     }
+  //   }, 130);
+  // };
 
   const markAsHard = () => {
     setIsFlipped(false);

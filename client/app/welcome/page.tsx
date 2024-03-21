@@ -17,6 +17,7 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase";
 import { Logo } from "@/components/icons";
 import { signOut } from "firebase/auth";
+import { Spinner } from "@nextui-org/react";
 
 export default function WelcomePage() {
 
@@ -28,6 +29,7 @@ export default function WelcomePage() {
 	const { tags, setTags } = tagsAvailable();
 	const [userIsBanned, setUserIsBanned] =useState();
 	const router = useRouter();
+	const [loading, setLoading] = useState<boolean>(true);
 
     const app = initializeApp(firebaseConfig);
 
@@ -47,79 +49,41 @@ export default function WelcomePage() {
 
 	const dummyContent = [
 		{
-		  title: "Kanskje fylle inn hvordan vi har oppfylt brukerhistoriene i de greiene her?",
 		  description: (
 			<>
 			  <p>
-				Sit duis est minim proident non nisi velit non consectetur. Esse
-				adipisicing laboris consectetur enim ipsum reprehenderit eu deserunt
-				Lorem ut aliqua anim do. Duis cupidatat qui irure cupidatat incididunt
-				incididunt enim magna id est qui sunt fugiat. Laboris do duis pariatur
-				fugiat Lorem aute sit ullamco. Qui deserunt non reprehenderit dolore
-				nisi velit exercitation Lorem qui do enim culpa. Aliqua eiusmod in
-				occaecat reprehenderit laborum nostrud fugiat voluptate do Lorem culpa
-				officia sint labore. Tempor consectetur excepteur ut fugiat veniam
-				commodo et labore dolore commodo pariatur.
-			  </p>
-			  <p>
-				Dolor minim irure ut Lorem proident. Ipsum do pariatur est ad ad
-				veniam in commodo id reprehenderit adipisicing. Proident duis
-				exercitation ad quis ex cupidatat cupidatat occaecat adipisicing.
-			  </p>
-			  <p>
-				Tempor quis dolor veniam quis dolor. Sit reprehenderit eiusmod
-				reprehenderit deserunt amet laborum consequat adipisicing officia qui
-				irure id sint adipisicing. Adipisicing fugiat aliqua nulla nostrud.
-				Amet culpa officia aliquip deserunt veniam deserunt officia
-				adipisicing aliquip proident officia sunt.
+				Tired of playing the same sets over and over again? Create your own!
 			  </p>
 			</>
 		  ),
-		  badge: "Filtrering og sortering",
+		  badge: "Create custom flashcards",
 		  image:
-			"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=3540&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+			"https://firebasestorage.googleapis.com/v0/b/flashy-3a502.appspot.com/o/flex1.png?alt=media&token=377bfb84-a140-4316-942e-6107765ad62a",
 		},
 		{
-		  title: "Lorem Ipsum Dolor Sit Amet",
 		  description: (
 			<>
 			  <p>
-				Ex irure dolore veniam ex velit non aute nisi labore ipsum occaecat
-				deserunt cupidatat aute. Enim cillum dolor et nulla sunt exercitation
-				non voluptate qui aliquip esse tempor. Ullamco ut sunt consectetur
-				sint qui qui do do qui do. Labore laborum culpa magna reprehenderit ea
-				velit id esse adipisicing deserunt amet dolore. Ipsum occaecat veniam
-				commodo proident aliqua id ad deserunt dolor aliquip duis veniam sunt.
-			  </p>
-			  <p>
-				In dolore veniam excepteur eu est et sunt velit. Ipsum sint esse
-				veniam fugiat esse qui sint ad sunt reprehenderit do qui proident
-				reprehenderit. Laborum exercitation aliqua reprehenderit ea sint
-				cillum ut mollit.
+				Troubles finding just the set for you? Dont worry, Flashy got you covered!
 			  </p>
 			</>
 		  ),
-		  badge: "Adminprofil",
+		  badge: "Searcing, filters, sorting",
 		  image:
-			"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=3540&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+			"https://firebasestorage.googleapis.com/v0/b/flashy-3a502.appspot.com/o/flex2.png?alt=media&token=5b9ef7b8-badf-4211-a169-bb796ad8b455",
 		},
 		{
-		  title: "Lorem Ipsum Dolor Sit Amet",
 		  description: (
 			<>
 			  <p>
-				Ex irure dolore veniam ex velit non aute nisi labore ipsum occaecat
-				deserunt cupidatat aute. Enim cillum dolor et nulla sunt exercitation
-				non voluptate qui aliquip esse tempor. Ullamco ut sunt consectetur
-				sint qui qui do do qui do. Labore laborum culpa magna reprehenderit ea
-				velit id esse adipisicing deserunt amet dolore. Ipsum occaecat veniam
-				commodo proident aliqua id ad deserunt dolor aliquip duis veniam sunt.
+				Worried about other users abusing Flashy?
+				Not with the newly implemented adminpage!
 			  </p>
 			</>
 		  ),
-		  badge: "Launch Week",
+		  badge: "Administer users",
 		  image:
-			"https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=3506&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+			"https://firebasestorage.googleapis.com/v0/b/flashy-3a502.appspot.com/o/flex3.png?alt=media&token=6922c82b-d729-4d7e-817d-0a15c634afd0",
 		},
 	  ];
   
@@ -190,7 +154,16 @@ export default function WelcomePage() {
 		  }
 		};
 		fetchData();
+		setLoading(false);
 	  }, [user]);
+
+	  if (loading) {
+		return (
+			<div className="flex justify-center align-center items-center">
+							<Spinner></Spinner>
+			</div>
+		);
+	  }
 
 	  if (userIsBanned) {
 		logOut();
@@ -205,10 +178,6 @@ export default function WelcomePage() {
 					<h2 className="bg-black text-white rounded-full text-sm w-fit px-4 py-1 mb-4">
 					  {item.badge}
 					</h2>
-		 
-					<p className={`${"font-calsans"} text-xl mb-4`}>
-					  {item.title}
-					</p>
 					  
 					<div className="text-sm  prose prose-sm dark:prose-invert">
 					  {item?.image && (
