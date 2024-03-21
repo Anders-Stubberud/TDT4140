@@ -13,16 +13,23 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
   const { tags, setTags } = tagsAvailable();
   const { idToLikeMapper, updateIdToLikeMapper } = idToLikeStore();
   const { editableSets, setEditableSets } = editForAll();
+  const [favs, setFavs] = useState<string []>([]);
 
   function isSubset(subset: string [], superset: string []) {
     return subset.every(item => superset.includes(item));
-  }  
+  } 
 
   const handleSearch = async () => {
     const endpoint = serverEndpoint + '/api/getFlashcards';
     if (first) {
       setFirst(false);
       try {
+
+        const responseFavs = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+        const resultFavs = await responseFavs.json();
+        const myFavSets = resultFavs.filter((val: any) => val != null && val != undefined).map((set: any) => set.flashcardSetID);
+        setFavs(myFavSets);
+
         const response = await fetch(endpoint, {
           method: "GET",
           headers: {
@@ -33,7 +40,6 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
-    
         const receivedData = await response.json();
         console.log(receivedData);
         receivedData.forEach((element: any) => {
@@ -56,10 +62,14 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
       isSubset(selectedItems.filter(str => str !== ''), value.tags)
       );
       if (isSelected) {
-        const response = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
-        const result = await response.json();
-        const favSets = result.filter((val: any) => val != null && val != undefined).map((set: any) => set.flashcardSetID);
-        filteredData = filteredData.filter((set) => favSets.includes(set.flashcardSetID));
+        // console.log('punch');
+        // const response = await fetch(`${serverEndpoint}/api/getFavourites/${localStorage.getItem('userID')}`);
+        // const result = await response.json();
+        // const favSets = result.filter((val: any) => val != null && val != undefined).map((set: any) => set.flashcardSetID);
+        filteredData = filteredData.filter((set) => favs.includes(set.flashcardSetID));
+      }
+      if (selectedItemsMyOwn) {
+        filteredData = filteredData.filter((set) => set.creatorID == localStorage.getItem('userID'));
       }
       if (selectedItemsSort.length == 0) {
         setData(filteredData);
@@ -91,9 +101,11 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
 
   const [isSelected, setIsSelected] = useState(false);
 
+  const [selectedItemsMyOwn, setSelectedItemsMyOwn] = useState<boolean>(false);
+
   useEffect(() => {
     handleSearch();
-  }, [isSelected])
+  }, [isSelected, selectedItemsMyOwn])
 
   const [selectedItems, setSelectedItems] = useState<string []>([]); //tags
 
@@ -145,6 +157,9 @@ export default function SearchBar({ setData, setNum, setIsLoading, data }: any )
         />
         <Checkbox className="mt-1" isSelected={isSelected} onValueChange={setIsSelected}>
           My favourite lists
+        </Checkbox>
+        <Checkbox className="mt-1 ml-6" isSelected={selectedItemsMyOwn} onValueChange={setSelectedItemsMyOwn}>
+          My own sets
         </Checkbox>
       </div>
 
