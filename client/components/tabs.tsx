@@ -16,10 +16,10 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { useState } from "react"
+import { serverEndpoint } from "@/state/zustand"
 
 export function TabsDemo() {
 
-  const baseURL = 'http://localhost:5000'
   const [name, setName] = useState("Pedro Duarte");
   const [userName, setUserName] = useState("@peduarte");
 
@@ -31,7 +31,7 @@ export function TabsDemo() {
     }
 
     try {
-      const response = await fetch(baseURL + '/api/editUser', {
+      const response = await fetch(serverEndpoint + '/api/editUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export function TabsDemo() {
           <CardHeader>
             <CardTitle>Account</CardTitle>
             <CardDescription>
-              Make changes to your account here. Click save when you're done.
+            Make changes to your account here. Click save when you&apos;re done.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">

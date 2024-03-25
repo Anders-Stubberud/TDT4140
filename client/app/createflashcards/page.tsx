@@ -1,47 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CreateflashcardForm } from "@/components/createflashcardForm";
-import { FlashcardCreated } from "@/components/flashcardCreated";
-import { FlashcardProvider } from "@/app/context/flashcardcontext";
 import { FlashcardForm } from "@/components/flashcardForm";
 import { Textarea } from "@nextui-org/input";
 import { Divider } from "@nextui-org/react";
 import {Input} from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
-import { changeUserInfo, editTheSet, serverEndpoint, tagsAvailable } from "@/state/zustand";
+import { editTheSet, serverEndpoint, tagsAvailable } from "@/state/zustand";
 import { useRef } from "react";
 import { CameraIcon } from "../../icons/cameraIcon";
-import { AvatarDemo } from "@/components/avatar";
-import { TabsDemo } from "@/components/tabs";
-import {Autocomplete, AutocompleteItem} from "@nextui-org/react";
 import {Select, SelectItem} from "@nextui-org/react";
-import {Card, CardBody} from "@nextui-org/react";
 import React from "react";
 import { changeCardsForm } from "@/state/zustand";
 import {v4 as uuidv4} from 'uuid';
 import { useRouter } from 'next/navigation'
 import { MultiStepLoaderDemo } from "@/components/multisteploader";
-import { flashcard, flashcardSet } from "@/state/zustand";
-import { title } from "process";
-import axios from "axios";
 import {Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import {CheckboxGroup, Checkbox} from "@nextui-org/react";
-import { json } from "stream/consumers";
 import TrashCanIcon2 from "@/icons/trashcan2";
 
 export default function CreateflashcardsPage(navigationData: any) {
 
   const [coverImage, setCoverImage] = useState<any>();
   const { tags, setTags } = tagsAvailable();
-  const [coverImageURL, setCoverImageURL] = useState<string | null>(null);
   const fileInputRef = useRef(null);
-  const router = useRouter();
   const { idOfSetToEdit, setIdOfSetToEdit } = editTheSet();
   const [numberOfLikes, setNumberOfLikes] = useState<number>(0);
   const [localSetID, setLocalSetID] = useState<string | null>(null);
   const [cardIDToURLMapper, setItems] = useState({});
-  const [selectedPrivacy, setSelectedPrivacy] = useState<string []>([]);
   const addKeyValuePair = (key: any, value: any) => {
     setItems(prevItems => ({ ...prevItems, [key]: value }));
   };
@@ -280,7 +266,7 @@ export default function CreateflashcardsPage(navigationData: any) {
       formData.append('public_use', JSON.stringify(selectedValues.includes('public_use')));
       formData.append('public_edit', JSON.stringify(selectedValues.includes('public_edit')));
 
-      const response = await fetch("http://localhost:5001/api/upload", {
+      const response = await fetch(serverEndpoint + "/api/upload", {
         method: "POST",
         body: formData,
       });

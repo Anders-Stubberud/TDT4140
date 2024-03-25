@@ -102,7 +102,7 @@ export interface user {
     favourites: string []
 }
 
-export const serverEndpoint = "http://localhost:5001"
+export const serverEndpoint = "https://tdt4140.onrender.com";
 
 export function JSONToFlashcardSet(jsonData: any): flashcardSet[] {
     console.log(jsonData);

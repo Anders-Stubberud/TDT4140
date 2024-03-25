@@ -1,7 +1,7 @@
 {
   "name": "flashy_client",
   "version": "0.0.1",
-  "proxy": "http://localhost:5001",
+  "proxy": "https://tdt4140.onrender.com",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -61,7 +61,7 @@
     "fs": "^0.0.1-security",
     "intl-messageformat": "^10.5.0",
     "lucide-react": "^0.324.0",
-    "next": "^14.1.0",
+    "next": "^14.1.4",
     "next-themes": "^0.2.1",
     "postcss": "8.4.31",
     "react": "18.2.0",

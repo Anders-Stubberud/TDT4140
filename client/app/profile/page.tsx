@@ -17,7 +17,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { Button, user } from "@nextui-org/react";
-import { CameraIcon } from "../../../icons/cameraIcon";
+import { CameraIcon } from "../../icons/cameraIcon";
 import { useEffect, useRef, useState } from "react";
 import { AvatarDemo } from "@/components/avatar";
 import { FlashyButton } from "@/components/borderFlash";
@@ -165,7 +165,7 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle>Account</CardTitle>
                 <CardDescription>
-                  Make changes to your account here. Click save when you're done.
+                Make changes to your account here. Click save when you&apos;re done.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">

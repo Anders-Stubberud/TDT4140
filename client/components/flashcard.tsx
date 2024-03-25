@@ -33,7 +33,9 @@ interface FlashcardRef {
 }
 
 export const FlashCard = forwardRef<FlashcardRef, {}>(() => {
-  // const [flashcardSet, setFlashcardSet] = useState<flashcardSet | null>(null);
+
+  FlashCard.displayName = "FlashCard";
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const { setname, setSet } = toggleSet();
   const flashcardArrayRef = useRef<FlashcardRef>({

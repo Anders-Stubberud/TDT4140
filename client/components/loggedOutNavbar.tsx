@@ -87,7 +87,7 @@ export const LoggedOutNavbar = () => {
         <NavbarMenuToggle />
       </NavbarContent>
       <Button onClick={() => router.push('/login')}>
-          Let's go
+      Let&apos;s go
       </Button>
     </NextUINavbar>
   );

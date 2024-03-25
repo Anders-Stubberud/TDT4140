@@ -1,22 +1,15 @@
 "use client";
 
-import FlashcardSetListDisplay from "@/components/flashcardSetListDisplay";
-import { title } from "@/components/primitives";
-import { DataTableDemo } from "@/components/scrollarea";
 import SearchBar from "@/components/searchbar";
 import FlashcardSetList from "@/components/flashcardSetList";
 import { useEffect, useState } from "react";
 import { flashcardSet, editIndexing, tagsAvailable } from "@/state/zustand";
-import { Filters } from "@/components/filters";
 
-export default function filterSetsPage() {
+export default function FilterSetsPage() {
 
   const [data, setData] = useState([]);
   const [num, setNum] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { tags, setTags } = tagsAvailable();
-
-  const { indexZustand, setIndexZustand } = editIndexing();
 
   return (
     <div>

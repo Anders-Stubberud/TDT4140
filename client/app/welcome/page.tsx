@@ -5,7 +5,7 @@ import { title } from "@/components/primitives";
 import { getAuth } from "firebase/auth";
 import { use, useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { zustand, useUserStore, user, tagsAvailable } from "../../state/zustand";
+import { zustand, useUserStore, user, tagsAvailable, serverEndpoint } from "../../state/zustand";
 import firebase from "firebase/compat/app";
 import * as firebaseui from "firebaseui";
 import "firebaseui/dist/firebaseui.css";
@@ -25,7 +25,6 @@ export default function WelcomePage() {
 	const { setUserIDZustand, setUserNameZustand, setProfileImageURLZustand, setIsAdmin, setIsBanned } = useUserStore();
 	const auth = getAuth();
 	const [user] = useAuthState(auth);
-	const apiURL = "http://localhost:5001/api";
 	const { tags, setTags } = tagsAvailable();
 	const [userIsBanned, setUserIsBanned] =useState();
 	const router = useRouter();
@@ -93,7 +92,7 @@ export default function WelcomePage() {
 		  if (user) {
 			console.log('a');
 			try {
-			  const response = await fetch(apiURL + `/userExists/${user.uid}`);
+			  const response = await fetch(serverEndpoint + `/api/userExists/${user.uid}`);
 			  console.log('b');
 			  if (response.ok) {
 				const { userExists } = await response.json();
@@ -104,7 +103,7 @@ export default function WelcomePage() {
 				  const randomUsername2 = await fetch(url, options);
 				  const resultRandomUsername2 = await randomUsername2.text();
 				  console.log(resultRandomUsername);
-				  const setupResponse = await fetch(apiURL + "/setupUser", {
+				  const setupResponse = await fetch(serverEndpoint + "/api/setupUser", {
 					method: "POST",
 					headers: {
 					  "Content-Type": "application/json",
@@ -129,13 +128,13 @@ export default function WelcomePage() {
 
 				//using zustand and localstorage to manage global user state
 				localStorage.setItem('userID', user.uid);
-				const res = await fetch(apiURL + `/getUserInformation/${user?.uid}`);
+				const res = await fetch(serverEndpoint + `/api/getUserInformation/${user?.uid}`);
 				const data = await res.json();
 				setIsAdmin(data.admin);
 				const ban = data.banned;
 				console.log(ban);
 				setUserIsBanned(ban);
-				const taggiesRAW = await fetch(`${apiURL}/getTags`);
+				const taggiesRAW = await fetch(`${serverEndpoint}/api/getTags`);
 				const taggies = await taggiesRAW.json();
 				const tagsArr = taggies.tagsArr;
 				setTags(tagsArr);
