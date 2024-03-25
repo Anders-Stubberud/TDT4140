@@ -69,6 +69,7 @@ export default function CreateflashcardsPage(navigationData: any) {
           setDescription(description);
           const newCardFormArr = flashcards.map((value: any, index: number) => (
             <FlashcardForm 
+            key={index}
             hasAnswerImage={cardInformation.some((value: any) => value.cardID == value.props.id && value.answerImage != null && value.answerImage != undefined)}
             hasQuestionImage={cardInformation.some((value: any) => value.cardID == value.props.id && value.questionImage != null && value.questionImage != undefined)}      
             handleAnswerImageChange={handleAnswerImageChange}
@@ -121,6 +122,7 @@ export default function CreateflashcardsPage(navigationData: any) {
     
         const newCardFormArr = fetchedQuestions.map((question, index) => (
           <FlashcardForm 
+          key={index}
           hasAnswerImage={false}
           hasQuestionImage={false}
             handleAnswerImageChange={handleAnswerImageChange}
