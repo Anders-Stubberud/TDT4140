@@ -1,6 +1,9 @@
 # TDT4140 Gruppe 40 - Flashy
 
-This readme provides documentation for how you can download and test out the product.
+This readme provides documentation for how you can download and test out the product locally.
+
+The product is deployed to <a href="https://tdt-4140-group-40.vercel.app/" target="_blank">tdt-4140-group-40.vercel.app</a>
+
 
 ## Prerequisites
 

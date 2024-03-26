@@ -7,18 +7,16 @@ import ScrollArea from 'react-scrollbar';
 import UserIcon from "@/icons/userIcon";
 import AdminIcon from "@/icons/adminIcon";
 import { useUserStore } from "@/state/zustand";
-import { useRouter } from "next/router";
 
 export default function Admin() {
   const [users, setUsers] = useState<any[]>([]);
   const { isAdmin } = useUserStore();
-  const router = useRouter(); // Initialize useRouter hook
 
   useEffect(() => {
-    if (typeof window !== "undefined" && router.isReady) { // Check if window is defined and router is ready
+    if (typeof window !== "undefined") { // Check if window is defined and router is ready
       fetchUsers();
     }
-  }, [router.isReady])
+  }, [])
 
   if ((!isAdmin) && (!localStorage.getItem('admin'))) {
     return (
